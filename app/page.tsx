@@ -148,7 +148,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<
     "modules" | "functions" | "atoms" | "types" | "constants"
   >("functions");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("only minted");
   const [sourceFilter, setSourceFilter] = useState<
     "all" | "stdlib" | "prelude" | "vodka"
   >("all");
@@ -556,46 +556,25 @@ export default function Home() {
       />
 
       <div>
-        <StatsGrid stats={data.stats} />
-
         <div className="flex flex-wrap gap-3 items-center m-5">
-          <SearchFilters
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            sourceFilter={sourceFilter}
-            setSourceFilter={setSourceFilter}
-            sourceCounts={sourceCounts}
-          />
+          <div className="flex flex-col gap-5 w-full">
+            <SearchFilters
+              toggleGlobalCodeBlocks={toggleGlobalCodeBlocks}
+              showCodeBlocksByDefault={showCodeBlocksByDefault}
+              expandedCodeBlocks={expandedCodeBlocks}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              sourceFilter={sourceFilter}
+              setSourceFilter={setSourceFilter}
+              sourceCounts={sourceCounts}
+            />
 
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400">Code blocks:</span>
-            <button
-              onClick={toggleGlobalCodeBlocks}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                showCodeBlocksByDefault
-                  ? "button-1"
-                  : "button-1 !bg-neutral-900 !text-pink-300"
-              }`}
-            >
-              {showCodeBlocksByDefault ? (
-                <>
-                  <IconEye size={16} />
-                  Show by default
-                </>
-              ) : (
-                <>
-                  <IconEyeOff size={16} />
-                  Hide by default
-                </>
-              )}
-            </button>
+            <TabNavigation
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              tabCounts={tabCounts}
+            />
           </div>
-
-          <TabNavigation
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            tabCounts={tabCounts}
-          />
         </div>
 
         <div className="overflow-x-auto">
