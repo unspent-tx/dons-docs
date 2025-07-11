@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAikenSDK } from "@dons-docs/aiken-sdk";
+import { join } from "path";
 
 let cachedData: any = null;
 let lastCacheTime = 0;
@@ -12,8 +13,14 @@ export async function GET() {
       return NextResponse.json(cachedData);
     }
 
-    // Initialize SDK with all three sources
-    const sdk = createAikenSDK();
+    // Get the correct paths from the project root
+    const projectRoot = process.cwd();
+    const stdlibPath = join(projectRoot, "packages/aiken-stdlib");
+    const preludePath = join(projectRoot, "packages/aiken-prelude/lib");
+    const vodkaPath = join(projectRoot, "packages/aiken-vodka/lib");
+
+    // Initialize SDK with all three sources and correct paths
+    const sdk = createAikenSDK(stdlibPath, preludePath, vodkaPath);
 
     // Load library with all sources including vodka
     await sdk.loadLibrary({

@@ -20,6 +20,10 @@ export type {
 } from "./types.js";
 
 // Export a default instance creator
-export function createAikenSDK(stdlibPath?: string) {
-  return new AikenSDK(stdlibPath);
+export function createAikenSDK(
+  stdlibPath?: string,
+  preludePath?: string,
+  vodkaPath?: string
+) {
+  return new AikenSDK(stdlibPath, preludePath, vodkaPath);
 }
