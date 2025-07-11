@@ -29,7 +29,7 @@ export default function Header({ stats, onRefresh, isLoading }: HeaderProps) {
             {stats.totalConstants} <span className="text-sm">constants</span>
           </div>
         </div>
-        {/* 
+
         <button
           onClick={onRefresh}
           disabled={isLoading}
@@ -39,7 +39,7 @@ export default function Header({ stats, onRefresh, isLoading }: HeaderProps) {
         >
           <IconRefresh size={18} className={isLoading ? "animate-spin" : ""} />
           {isLoading ? "Refreshing..." : "Refresh"}
-        </button> */}
+        </button>
       </div>
     </div>
   );
