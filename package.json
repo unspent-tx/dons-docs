@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run build-sdk && next build",
+    "build": "npm run build-sdk && node scripts/copy-aiken-files.js && next build",
     "start": "next start",
     "lint": "next lint",
     "demo-aiken": "tsx demo-aiken-sdk.ts",

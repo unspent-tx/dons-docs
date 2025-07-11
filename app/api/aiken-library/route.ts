@@ -15,9 +15,9 @@ export async function GET() {
 
     // Get the correct paths from the project root
     const projectRoot = process.cwd();
-    const stdlibPath = join(projectRoot, "packages/aiken-stdlib");
-    const preludePath = join(projectRoot, "packages/aiken-prelude/lib");
-    const vodkaPath = join(projectRoot, "packages/aiken-vodka/lib");
+    const stdlibPath = join(projectRoot, "public/aiken-lib/aiken-stdlib");
+    const preludePath = join(projectRoot, "public/aiken-lib/aiken-prelude");
+    const vodkaPath = join(projectRoot, "public/aiken-lib/aiken-vodka");
 
     // Initialize SDK with all three sources and correct paths
     const sdk = createAikenSDK(stdlibPath, preludePath, vodkaPath);
