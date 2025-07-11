@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createAikenSDK } from "../../../packages/aiken-sdk/dist/index.js";
+import { createAikenSDK } from "@dons-docs/aiken-sdk";
 
 let cachedData: any = null;
 let lastCacheTime = 0;
