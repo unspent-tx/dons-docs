@@ -22,15 +22,15 @@ export default function Header({ stats, onRefresh, isLoading }: HeaderProps) {
               Don's Docs
             </h1>
           </div>
-          <div className="text-4xl font-mono text-neutral-400">
+          {/* <div className="text-4xl font-mono text-neutral-400">
             {stats.totalModules} <span className="text-sm">modules</span> •{" "}
             {stats.totalFunctions} <span className="text-sm">functions</span> •{" "}
             {stats.totalTypes} <span className="text-sm">types</span> •{" "}
             {stats.totalConstants} <span className="text-sm">constants</span>
-          </div>
+          </div> */}
         </div>
 
-        <button
+        {/* <button
           onClick={onRefresh}
           disabled={isLoading}
           className={`button-1 px-4 py-2 flex items-center gap-2 ${
@@ -39,7 +39,7 @@ export default function Header({ stats, onRefresh, isLoading }: HeaderProps) {
         >
           <IconRefresh size={18} className={isLoading ? "animate-spin" : ""} />
           {isLoading ? "Refreshing..." : "Refresh"}
-        </button>
+        </button> */}
       </div>
     </div>
   );
