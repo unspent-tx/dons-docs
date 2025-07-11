@@ -2,6 +2,37 @@
   "name": "dons-docs",
   "version": "0.1.0",
   "private": true,
+  "description": "Interactive documentation browser for Aiken libraries including stdlib, prelude, and vodka packages",
+  "keywords": [
+    "aiken",
+    "documentation",
+    "cardano",
+    "blockchain",
+    "smart-contracts",
+    "stdlib",
+    "prelude",
+    "vodka",
+    "typescript",
+    "nextjs",
+    "react"
+  ],
+  "author": {
+    "name": "Don's Docs Team",
+    "email": "team@dons-docs.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dons-docs/dons-docs.git"
+  },
+  "homepage": "https://dons-docs.com",
+  "bugs": {
+    "url": "https://github.com/dons-docs/dons-docs/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "npm run build-sdk && node scripts/copy-aiken-files.js && next build",

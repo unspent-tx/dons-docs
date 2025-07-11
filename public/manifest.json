@@ -1,0 +1,63 @@
+{
+  "name": "Don's Docs - Aiken Library Documentation Browser",
+  "short_name": "Don's Docs",
+  "description": "Interactive documentation browser for Aiken libraries including stdlib, prelude, and vodka packages",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["documentation", "developer", "education"],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Don's Docs - Aiken Library Documentation Browser"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Functions",
+      "short_name": "Functions",
+      "description": "Browse Aiken functions",
+      "url": "/?tab=functions",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Types",
+      "short_name": "Types",
+      "description": "Browse Aiken types",
+      "url": "/?tab=types",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
