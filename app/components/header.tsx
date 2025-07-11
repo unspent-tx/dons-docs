@@ -13,7 +13,7 @@ export default function Header({ stats, onRefresh, isLoading }: HeaderProps) {
       <div className="">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="">
-            <h1 className="font-bold whitespace-nowrap text-7xl text-neutral-300">
+            <h1 className="font-bold whitespace-nowrap text-7xl text-neutral-100">
               Don's Docs
             </h1>
           </div>
