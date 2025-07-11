@@ -6,19 +6,29 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "demo-aiken": "tsx demo-aiken-sdk.ts",
+    "build-sdk": "cd packages/aiken-sdk && npm run build"
   },
   "dependencies": {
+    "@dons-docs/aiken-sdk": "file:./packages/aiken-sdk",
+    "@dons-docs/aiken-stdlib": "file:./packages/aiken-stdlib",
+    "@tabler/icons-react": "^3.34.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "next": "15.3.5",
+    "prism-react-renderer": "^2.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.3.5"
+    "react-hot-toast": "^2.5.2",
+    "react-syntax-highlighter": "^15.6.1"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "tsx": "^4.0.0",
+    "typescript": "^5"
   }
 }

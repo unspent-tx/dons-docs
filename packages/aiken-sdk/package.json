@@ -1,0 +1,31 @@
+{
+  "name": "@dons-docs/aiken-sdk",
+  "version": "1.0.0",
+  "description": "SDK for analyzing and consuming Aiken standard library functions",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "demo": "node demo.js"
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "keywords": [
+    "aiken",
+    "sdk",
+    "analyzer",
+    "parser"
+  ],
+  "author": "dons-docs",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "dependencies": {
+    "@dons-docs/aiken-stdlib": "file:../aiken-stdlib"
+  }
+}
