@@ -148,7 +148,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<
     "modules" | "functions" | "atoms" | "types" | "constants"
   >("functions");
-  const [searchQuery, setSearchQuery] = useState("only minted");
+  const [searchQuery, setSearchQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<
     "all" | "stdlib" | "prelude" | "vodka"
   >("all");
@@ -558,6 +558,11 @@ export default function Home() {
       <div>
         <div className="flex flex-wrap gap-3 items-center m-5">
           <div className="flex flex-col gap-5 w-full">
+            <TabNavigation
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              tabCounts={tabCounts}
+            />
             <SearchFilters
               toggleGlobalCodeBlocks={toggleGlobalCodeBlocks}
               showCodeBlocksByDefault={showCodeBlocksByDefault}
@@ -567,12 +572,6 @@ export default function Home() {
               sourceFilter={sourceFilter}
               setSourceFilter={setSourceFilter}
               sourceCounts={sourceCounts}
-            />
-
-            <TabNavigation
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              tabCounts={tabCounts}
             />
           </div>
         </div>
