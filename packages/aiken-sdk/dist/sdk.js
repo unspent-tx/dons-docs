@@ -9,11 +9,14 @@ export class AikenSDK {
     stdlibPath;
     preludePath;
     vodkaPath;
-    constructor(stdlibPath, preludePath, vodkaPath) {
+    anastasiaPath;
+    constructor(stdlibPath, preludePath, vodkaPath, anastasiaPath) {
         this.stdlibPath = stdlibPath || join(__dirname, "../../aiken-stdlib");
         this.preludePath =
             preludePath || join(__dirname, "../../aiken-prelude/lib");
         this.vodkaPath = vodkaPath || join(__dirname, "../../aiken-vodka/lib");
+        this.anastasiaPath =
+            anastasiaPath || join(__dirname, "../../aiken-design-patterns/lib");
         this.library = {
             modules: new Map(),
             dependencies: new Map(),
@@ -54,6 +57,15 @@ export class AikenSDK {
                     constants: 0,
                     privateConstants: 0,
                 },
+                anastasia: {
+                    modules: 0,
+                    functions: 0,
+                    atoms: 0,
+                    types: 0,
+                    privateTypes: 0,
+                    constants: 0,
+                    privateConstants: 0,
+                },
             },
         };
     }
@@ -61,7 +73,12 @@ export class AikenSDK {
      * Load and analyze Aiken libraries from multiple sources
      */
     async loadLibrary(options = {}) {
-        const sources = options.sources || ["stdlib", "prelude", "vodka"];
+        const sources = options.sources || [
+            "stdlib",
+            "prelude",
+            "vodka",
+            "anastasia",
+        ];
         console.log(`Loading Aiken libraries from sources: ${sources.join(", ")}`);
         // Clear existing data
         this.clearLibrary();
@@ -76,6 +93,10 @@ export class AikenSDK {
         // Load vodka if requested
         if (sources.includes("vodka")) {
             await this.loadSourceLibrary("vodka", this.vodkaPath, options);
+        }
+        // Load anastasia if requested
+        if (sources.includes("anastasia")) {
+            await this.loadSourceLibrary("anastasia", this.anastasiaPath, options);
         }
         // Process vodka re-exports if vodka was loaded
         if (sources.includes("vodka")) {
@@ -115,6 +136,15 @@ export class AikenSDK {
             privateConstants: 0,
         };
         this.library.sourceStats.vodka = {
+            modules: 0,
+            functions: 0,
+            atoms: 0,
+            types: 0,
+            privateTypes: 0,
+            constants: 0,
+            privateConstants: 0,
+        };
+        this.library.sourceStats.anastasia = {
             modules: 0,
             functions: 0,
             atoms: 0,

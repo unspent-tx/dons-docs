@@ -4,7 +4,7 @@ export interface AikenImport {
   alias?: string;
   line: number;
   raw: string;
-  source: "stdlib" | "prelude" | "vodka";
+  source: "stdlib" | "prelude" | "vodka" | "anastasia";
 }
 
 export interface AikenFunction {
@@ -16,7 +16,7 @@ export interface AikenFunction {
   line: number;
   raw: string;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka";
+  source: "stdlib" | "prelude" | "vodka" | "anastasia";
   // For vodka library: track re-exported names
   reExportedAs?: string[];
   // Full function implementation body
@@ -37,7 +37,7 @@ export interface AikenType {
   line: number;
   raw: string;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka";
+  source: "stdlib" | "prelude" | "vodka" | "anastasia";
   // For vodka library: track re-exported names
   reExportedAs?: string[];
 }
@@ -49,7 +49,7 @@ export interface AikenConstant {
   line: number;
   raw: string;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka";
+  source: "stdlib" | "prelude" | "vodka" | "anastasia";
   // For vodka library: track re-exported names
   reExportedAs?: string[];
 }
@@ -68,7 +68,7 @@ export interface AikenModule {
   privateConstants: AikenConstant[];
   content: string;
   dependencies: string[];
-  source: "stdlib" | "prelude" | "vodka";
+  source: "stdlib" | "prelude" | "vodka" | "anastasia";
   // For vodka library: track if this is a re-export file
   isReExportFile?: boolean;
 }
@@ -113,6 +113,15 @@ export interface AikenLibrary {
       constants: number;
       privateConstants: number;
     };
+    anastasia: {
+      modules: number;
+      functions: number;
+      atoms: number;
+      types: number;
+      privateTypes: number;
+      constants: number;
+      privateConstants: number;
+    };
   };
 }
 
@@ -121,5 +130,5 @@ export interface ParseOptions {
   includeComments?: boolean;
   followDependencies?: boolean;
   includePrivate?: boolean; // Whether to include private functions/types/constants
-  sources?: Array<"stdlib" | "prelude" | "vodka">; // Which sources to analyze
+  sources?: Array<"stdlib" | "prelude" | "vodka" | "anastasia">; // Which sources to analyze
 }

@@ -4,7 +4,7 @@ export interface AikenImport {
     alias?: string;
     line: number;
     raw: string;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
 }
 export interface AikenFunction {
     name: string;
@@ -15,7 +15,7 @@ export interface AikenFunction {
     line: number;
     raw: string;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
     implementation?: string;
     tests?: string[];
@@ -31,7 +31,7 @@ export interface AikenType {
     line: number;
     raw: string;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
 }
 export interface AikenConstant {
@@ -41,7 +41,7 @@ export interface AikenConstant {
     line: number;
     raw: string;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
 }
 export interface AikenModule {
@@ -56,7 +56,7 @@ export interface AikenModule {
     privateConstants: AikenConstant[];
     content: string;
     dependencies: string[];
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     isReExportFile?: boolean;
 }
 export interface AikenLibrary {
@@ -96,6 +96,15 @@ export interface AikenLibrary {
             constants: number;
             privateConstants: number;
         };
+        anastasia: {
+            modules: number;
+            functions: number;
+            atoms: number;
+            types: number;
+            privateTypes: number;
+            constants: number;
+            privateConstants: number;
+        };
     };
 }
 export interface ParseOptions {
@@ -103,6 +112,6 @@ export interface ParseOptions {
     includeComments?: boolean;
     followDependencies?: boolean;
     includePrivate?: boolean;
-    sources?: Array<"stdlib" | "prelude" | "vodka">;
+    sources?: Array<"stdlib" | "prelude" | "vodka" | "anastasia">;
 }
 //# sourceMappingURL=types.d.ts.map

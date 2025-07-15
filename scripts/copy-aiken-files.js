@@ -40,4 +40,20 @@ if (fs.existsSync(stdlibSource)) {
   console.error("✗ aiken-stdlib source not found:", stdlibSource);
 }
 
+// Copy aiken-design-patterns files
+const designPatternsSource = path.join(
+  __dirname,
+  "../packages/aiken-design-patterns/lib"
+);
+const designPatternsTarget = path.join(aikenLibDir, "aiken-design-patterns");
+if (fs.existsSync(designPatternsSource)) {
+  fs.cpSync(designPatternsSource, designPatternsTarget, { recursive: true });
+  console.log("✓ Copied aiken-design-patterns files");
+} else {
+  console.error(
+    "✗ aiken-design-patterns source not found:",
+    designPatternsSource
+  );
+}
+
 console.log("Aiken library files copied to public folder");

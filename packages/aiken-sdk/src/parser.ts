@@ -12,7 +12,7 @@ export class AikenParser {
    */
   static parseImports(
     content: string,
-    source: "stdlib" | "prelude" | "vodka" = "stdlib"
+    source: "stdlib" | "prelude" | "vodka" | "anastasia" = "stdlib"
   ): AikenImport[] {
     const imports: AikenImport[] = [];
     const lines = content.split("\n");
@@ -53,7 +53,7 @@ export class AikenParser {
    */
   static parseFunctions(
     content: string,
-    source: "stdlib" | "prelude" | "vodka" = "stdlib"
+    source: "stdlib" | "prelude" | "vodka" | "anastasia" = "stdlib"
   ): AikenFunction[] {
     const functions: AikenFunction[] = [];
     const lines = content.split("\n");
@@ -284,7 +284,7 @@ export class AikenParser {
    */
   static parseTypes(
     content: string,
-    source: "stdlib" | "prelude" | "vodka" = "stdlib"
+    source: "stdlib" | "prelude" | "vodka" | "anastasia" = "stdlib"
   ): AikenType[] {
     const types: AikenType[] = [];
     const lines = content.split("\n");
@@ -451,7 +451,7 @@ export class AikenParser {
    */
   static parseConstants(
     content: string,
-    source: "stdlib" | "prelude" | "vodka" = "stdlib"
+    source: "stdlib" | "prelude" | "vodka" | "anastasia" = "stdlib"
   ): AikenConstant[] {
     const constants: AikenConstant[] = [];
     const lines = content.split("\n");
@@ -617,7 +617,7 @@ export class AikenParser {
    */
   static isVodkaReExportFile(
     moduleName: string,
-    source: "stdlib" | "prelude" | "vodka"
+    source: "stdlib" | "prelude" | "vodka" | "anastasia"
   ): boolean {
     if (source !== "vodka") return false;
 

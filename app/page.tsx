@@ -53,12 +53,21 @@ interface LibraryData {
         constants: number;
         privateConstants: number;
       };
+      anastasia: {
+        modules: number;
+        functions: number;
+        atoms: number;
+        types: number;
+        privateTypes: number;
+        constants: number;
+        privateConstants: number;
+      };
     };
   };
   modules: Array<{
     key: string;
     name: string;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     functions: number;
     atoms: number;
     types: number;
@@ -82,7 +91,7 @@ interface LibraryData {
     returnType: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
   }>;
   atoms: Array<{
@@ -98,7 +107,7 @@ interface LibraryData {
     returnType: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
   }>;
   types: Array<{
@@ -107,7 +116,7 @@ interface LibraryData {
     definition: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
   }>;
   privateTypes: Array<{
@@ -116,7 +125,7 @@ interface LibraryData {
     definition: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
   }>;
   constants: Array<{
@@ -126,7 +135,7 @@ interface LibraryData {
     value: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
   }>;
   privateConstants: Array<{
@@ -136,7 +145,7 @@ interface LibraryData {
     value: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka";
+    source: "stdlib" | "prelude" | "vodka" | "anastasia";
     reExportedAs?: string[];
   }>;
 }
@@ -150,7 +159,7 @@ export default function Home() {
   >("functions");
   const [searchQuery, setSearchQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<
-    "all" | "stdlib" | "prelude" | "vodka"
+    "all" | "stdlib" | "prelude" | "vodka" | "anastasia"
   >("all");
 
   // Pagination state - track if we should show all results or just first 10
@@ -531,6 +540,18 @@ export default function Home() {
       allFilteredPrivateTypes.filter((item) => item.source === "vodka").length +
       allFilteredConstants.filter((item) => item.source === "vodka").length +
       allFilteredPrivateConstants.filter((item) => item.source === "vodka")
+        .length,
+    anastasia:
+      allFilteredModules.filter((item) => item.source === "anastasia").length +
+      allFilteredFunctions.filter((item) => item.source === "anastasia")
+        .length +
+      allFilteredAtoms.filter((item) => item.source === "anastasia").length +
+      allFilteredTypes.filter((item) => item.source === "anastasia").length +
+      allFilteredPrivateTypes.filter((item) => item.source === "anastasia")
+        .length +
+      allFilteredConstants.filter((item) => item.source === "anastasia")
+        .length +
+      allFilteredPrivateConstants.filter((item) => item.source === "anastasia")
         .length,
   };
 

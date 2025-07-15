@@ -18,13 +18,22 @@ export async function GET() {
     const stdlibPath = join(projectRoot, "public/aiken-lib/aiken-stdlib");
     const preludePath = join(projectRoot, "public/aiken-lib/aiken-prelude");
     const vodkaPath = join(projectRoot, "public/aiken-lib/aiken-vodka");
+    const anastasiaPath = join(
+      projectRoot,
+      "public/aiken-lib/aiken-design-patterns"
+    );
 
-    // Initialize SDK with all three sources and correct paths
-    const sdk = createAikenSDK(stdlibPath, preludePath, vodkaPath);
+    // Initialize SDK with all four sources and correct paths
+    const sdk = createAikenSDK(
+      stdlibPath,
+      preludePath,
+      vodkaPath,
+      anastasiaPath
+    );
 
-    // Load library with all sources including vodka
+    // Load library with all sources including anastasia
     await sdk.loadLibrary({
-      sources: ["stdlib", "prelude", "vodka"],
+      sources: ["stdlib", "prelude", "vodka", "anastasia"],
       includePrivate: true,
     });
 

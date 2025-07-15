@@ -23,7 +23,8 @@ export type {
 export function createAikenSDK(
   stdlibPath?: string,
   preludePath?: string,
-  vodkaPath?: string
+  vodkaPath?: string,
+  anastasiaPath?: string
 ) {
-  return new AikenSDK(stdlibPath, preludePath, vodkaPath);
+  return new AikenSDK(stdlibPath, preludePath, vodkaPath, anastasiaPath);
 }

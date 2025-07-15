@@ -4,7 +4,8 @@ export declare class AikenSDK {
     private stdlibPath;
     private preludePath;
     private vodkaPath;
-    constructor(stdlibPath?: string, preludePath?: string, vodkaPath?: string);
+    private anastasiaPath;
+    constructor(stdlibPath?: string, preludePath?: string, vodkaPath?: string, anastasiaPath?: string);
     /**
      * Load and analyze Aiken libraries from multiple sources
      */
@@ -44,7 +45,7 @@ export declare class AikenSDK {
     /**
      * Get modules by source
      */
-    getModulesBySource(source: "stdlib" | "prelude" | "vodka"): Map<string, AikenModule>;
+    getModulesBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, AikenModule>;
     /**
      * Get a specific module by name
      */
@@ -60,11 +61,11 @@ export declare class AikenSDK {
     /**
      * Get functions by source
      */
-    getFunctionsBySource(source: "stdlib" | "prelude" | "vodka"): Map<string, any>;
+    getFunctionsBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, any>;
     /**
      * Get atoms by source
      */
-    getAtomsBySource(source: "stdlib" | "prelude" | "vodka"): Map<string, any>;
+    getAtomsBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, any>;
     /**
      * Get public functions by module name
      */
@@ -92,7 +93,7 @@ export declare class AikenSDK {
     /**
      * Get types by source
      */
-    getTypesBySource(source: "stdlib" | "prelude" | "vodka"): Map<string, any>;
+    getTypesBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, any>;
     /**
      * Get all public constants from all modules
      */
@@ -104,7 +105,7 @@ export declare class AikenSDK {
     /**
      * Get constants by source
      */
-    getConstantsBySource(source: "stdlib" | "prelude" | "vodka"): Map<string, any>;
+    getConstantsBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, any>;
     /**
      * Get dependency tree for a module
      */
@@ -145,6 +146,15 @@ export declare class AikenSDK {
                 privateConstants: number;
             };
             vodka: {
+                modules: number;
+                functions: number;
+                atoms: number;
+                types: number;
+                privateTypes: number;
+                constants: number;
+                privateConstants: number;
+            };
+            anastasia: {
                 modules: number;
                 functions: number;
                 atoms: number;

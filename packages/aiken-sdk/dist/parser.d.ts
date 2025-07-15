@@ -3,19 +3,19 @@ export declare class AikenParser {
     /**
      * Parse imports from Aiken file content
      */
-    static parseImports(content: string, source?: "stdlib" | "prelude" | "vodka"): AikenImport[];
+    static parseImports(content: string, source?: "stdlib" | "prelude" | "vodka" | "anastasia"): AikenImport[];
     /**
      * Parse function definitions from Aiken file content
      */
-    static parseFunctions(content: string, source?: "stdlib" | "prelude" | "vodka"): AikenFunction[];
+    static parseFunctions(content: string, source?: "stdlib" | "prelude" | "vodka" | "anastasia"): AikenFunction[];
     /**
      * Parse type definitions from Aiken file content
      */
-    static parseTypes(content: string, source?: "stdlib" | "prelude" | "vodka"): AikenType[];
+    static parseTypes(content: string, source?: "stdlib" | "prelude" | "vodka" | "anastasia"): AikenType[];
     /**
      * Parse constants from Aiken file content - includes special handling for vodka re-exports
      */
-    static parseConstants(content: string, source?: "stdlib" | "prelude" | "vodka"): AikenConstant[];
+    static parseConstants(content: string, source?: "stdlib" | "prelude" | "vodka" | "anastasia"): AikenConstant[];
     /**
      * Parse function parameters
      */
@@ -27,7 +27,7 @@ export declare class AikenParser {
     /**
      * Check if a module is a re-export file for vodka library
      */
-    static isVodkaReExportFile(moduleName: string, source: "stdlib" | "prelude" | "vodka"): boolean;
+    static isVodkaReExportFile(moduleName: string, source: "stdlib" | "prelude" | "vodka" | "anastasia"): boolean;
     /**
      * Extract re-export relationships from vodka files
      */

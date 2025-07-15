@@ -16,13 +16,16 @@ interface SearchFiltersProps {
   expandedCodeBlocks: Set<string>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  sourceFilter: "all" | "stdlib" | "prelude" | "vodka";
-  setSourceFilter: (filter: "all" | "stdlib" | "prelude" | "vodka") => void;
+  sourceFilter: "all" | "stdlib" | "prelude" | "vodka" | "anastasia";
+  setSourceFilter: (
+    filter: "all" | "stdlib" | "prelude" | "vodka" | "anastasia"
+  ) => void;
   sourceCounts: {
     all: number;
     stdlib: number;
     prelude: number;
     vodka: number;
+    anastasia: number;
   };
 }
 
@@ -41,6 +44,7 @@ export default function SearchFilters({
     { value: "stdlib", label: "Standard Library", icon: IconBook },
     { value: "prelude", label: "Prelude", icon: IconCode },
     { value: "vodka", label: "Vodka", icon: IconBrandTabler },
+    { value: "anastasia", label: "Anastasia Design Patterns", icon: IconCode },
   ] as const;
 
   return (

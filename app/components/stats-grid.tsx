@@ -38,6 +38,15 @@ interface StatsGridProps {
         constants: number;
         privateConstants: number;
       };
+      anastasia: {
+        modules: number;
+        functions: number;
+        atoms: number;
+        types: number;
+        privateTypes: number;
+        constants: number;
+        privateConstants: number;
+      };
     };
   };
 }
@@ -76,6 +85,23 @@ export default function StatsGrid({ stats }: StatsGridProps) {
             { label: "Atoms", value: stats.sourceStats.vodka.atoms },
             { label: "Types", value: stats.sourceStats.vodka.types },
             { label: "Constants", value: stats.sourceStats.vodka.constants },
+          ]}
+        />
+
+        <StatCard
+          title="Design Patterns"
+          items={[
+            { label: "Modules", value: stats.sourceStats.anastasia.modules },
+            {
+              label: "Functions",
+              value: stats.sourceStats.anastasia.functions,
+            },
+            { label: "Atoms", value: stats.sourceStats.anastasia.atoms },
+            { label: "Types", value: stats.sourceStats.anastasia.types },
+            {
+              label: "Constants",
+              value: stats.sourceStats.anastasia.constants,
+            },
           ]}
         />
       </div>
