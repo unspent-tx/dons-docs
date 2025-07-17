@@ -1,10 +1,12 @@
+import { PACKAGE_REGISTRY } from "./registry.js";
+export type SourceType = (typeof PACKAGE_REGISTRY)[number]["id"];
 export interface AikenImport {
     module: string;
     items: string[];
     alias?: string;
     line: number;
     raw: string;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
 }
 export interface AikenFunction {
     name: string;
@@ -15,7 +17,7 @@ export interface AikenFunction {
     line: number;
     raw: string;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
     implementation?: string;
     tests?: string[];
@@ -31,7 +33,7 @@ export interface AikenType {
     line: number;
     raw: string;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
 }
 export interface AikenConstant {
@@ -41,7 +43,7 @@ export interface AikenConstant {
     line: number;
     raw: string;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
 }
 export interface AikenModule {
@@ -56,7 +58,7 @@ export interface AikenModule {
     privateConstants: AikenConstant[];
     content: string;
     dependencies: string[];
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     isReExportFile?: boolean;
 }
 export interface AikenLibrary {
@@ -69,34 +71,7 @@ export interface AikenLibrary {
     privateTypes: Map<string, AikenType>;
     privateConstants: Map<string, AikenConstant>;
     sourceStats: {
-        stdlib: {
-            modules: number;
-            functions: number;
-            atoms: number;
-            types: number;
-            privateTypes: number;
-            constants: number;
-            privateConstants: number;
-        };
-        prelude: {
-            modules: number;
-            functions: number;
-            atoms: number;
-            types: number;
-            privateTypes: number;
-            constants: number;
-            privateConstants: number;
-        };
-        vodka: {
-            modules: number;
-            functions: number;
-            atoms: number;
-            types: number;
-            privateTypes: number;
-            constants: number;
-            privateConstants: number;
-        };
-        anastasia: {
+        [K in SourceType]: {
             modules: number;
             functions: number;
             atoms: number;
@@ -112,6 +87,6 @@ export interface ParseOptions {
     includeComments?: boolean;
     followDependencies?: boolean;
     includePrivate?: boolean;
-    sources?: Array<"stdlib" | "prelude" | "vodka" | "anastasia">;
+    sources?: SourceType[];
 }
 //# sourceMappingURL=types.d.ts.map

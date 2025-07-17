@@ -1,21 +1,21 @@
-import { AikenImport, AikenFunction, AikenType, AikenConstant } from "./types.js";
+import { AikenImport, AikenFunction, AikenType, AikenConstant, SourceType } from "./types.js";
 export declare class AikenParser {
     /**
      * Parse imports from Aiken file content
      */
-    static parseImports(content: string, source?: "stdlib" | "prelude" | "vodka" | "anastasia"): AikenImport[];
+    static parseImports(content: string, source?: SourceType): AikenImport[];
     /**
      * Parse function definitions from Aiken file content
      */
-    static parseFunctions(content: string, source?: "stdlib" | "prelude" | "vodka" | "anastasia"): AikenFunction[];
+    static parseFunctions(content: string, source?: SourceType): AikenFunction[];
     /**
      * Parse type definitions from Aiken file content
      */
-    static parseTypes(content: string, source?: "stdlib" | "prelude" | "vodka" | "anastasia"): AikenType[];
+    static parseTypes(content: string, source?: SourceType): AikenType[];
     /**
      * Parse constants from Aiken file content - includes special handling for vodka re-exports
      */
-    static parseConstants(content: string, source?: "stdlib" | "prelude" | "vodka" | "anastasia"): AikenConstant[];
+    static parseConstants(content: string, source?: SourceType): AikenConstant[];
     /**
      * Parse function parameters
      */
@@ -27,7 +27,7 @@ export declare class AikenParser {
     /**
      * Check if a module is a re-export file for vodka library
      */
-    static isVodkaReExportFile(moduleName: string, source: "stdlib" | "prelude" | "vodka" | "anastasia"): boolean;
+    static isVodkaReExportFile(moduleName: string, source: SourceType): boolean;
     /**
      * Extract re-export relationships from vodka files
      */

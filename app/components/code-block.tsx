@@ -2,7 +2,7 @@ import { Highlight, themes, Prism, PrismTheme } from "prism-react-renderer";
 import { useState } from "react";
 
 // Custom theme with CSS variables
-const customTheme: PrismTheme = {
+export const customTheme: PrismTheme = {
   plain: {
     color: "var(--color-neutral-300)", // Bright text for contrast
     backgroundColor: "var(--color-neutral-900)", // Darker background for depth

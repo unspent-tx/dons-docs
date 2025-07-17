@@ -61,44 +61,42 @@ export default function TypesView({
   };
 
   return (
-    <div>
-      <div className="">
-        {allTypes.map((type) => (
-          <ItemCard
-            key={type.fullName}
-            ref={(el: HTMLDivElement | null) => {
-              typeRefs.current[type.fullName] = el;
-            }}
-            className={`transition-all duration-300 space-y-5 ${
-              highlightedType === type.fullName
-                ? "ring-2 ring-pink-500 bg-pink-950 "
-                : ""
-            }`}
-          >
-            <ItemHeader
-              name={type.name}
-              source={type.source}
-              badges={
-                !type.isPublic
-                  ? [
-                      <span key="private" className="text-orange-400">
-                        Private
-                      </span>,
-                    ]
-                  : undefined
-              }
-              line={type.line}
-            />
-            <ItemMeta fullName={type.fullName} />
-            <ClickableTypeCodeBlock
-              code={type.definition}
-              availableTypes={allTypes}
-              onTypeClick={handleTypeClick}
-            />
-            <ReExportBadge reExportedAs={type.reExportedAs} />
-          </ItemCard>
-        ))}
-      </div>
-    </div>
+    <>
+      {allTypes.map((type) => (
+        <ItemCard
+          key={type.fullName}
+          ref={(el: HTMLDivElement | null) => {
+            typeRefs.current[type.fullName] = el;
+          }}
+          className={`transition-all duration-300 space-y-5 ${
+            highlightedType === type.fullName
+              ? "ring-2 ring-pink-500 bg-pink-950 "
+              : ""
+          }`}
+        >
+          <ItemHeader
+            name={type.name}
+            source={type.source}
+            badges={
+              !type.isPublic
+                ? [
+                    <span key="private" className="text-orange-400">
+                      Private
+                    </span>,
+                  ]
+                : undefined
+            }
+            line={type.line}
+          />
+          <ItemMeta fullName={type.fullName} />
+          <ClickableTypeCodeBlock
+            code={type.definition}
+            availableTypes={allTypes}
+            onTypeClick={handleTypeClick}
+          />
+          <ReExportBadge reExportedAs={type.reExportedAs} />
+        </ItemCard>
+      ))}
+    </>
   );
 }

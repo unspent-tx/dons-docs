@@ -1,10 +1,15 @@
+import { PACKAGE_REGISTRY } from "./registry.js";
+
+// Generate source type from registry
+export type SourceType = (typeof PACKAGE_REGISTRY)[number]["id"];
+
 export interface AikenImport {
   module: string;
   items: string[];
   alias?: string;
   line: number;
   raw: string;
-  source: "stdlib" | "prelude" | "vodka" | "anastasia";
+  source: SourceType; // Changed from hardcoded union
 }
 
 export interface AikenFunction {
@@ -16,7 +21,7 @@ export interface AikenFunction {
   line: number;
   raw: string;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka" | "anastasia";
+  source: SourceType; // Changed from hardcoded union
   // For vodka library: track re-exported names
   reExportedAs?: string[];
   // Full function implementation body
@@ -37,7 +42,7 @@ export interface AikenType {
   line: number;
   raw: string;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka" | "anastasia";
+  source: SourceType; // Changed from hardcoded union
   // For vodka library: track re-exported names
   reExportedAs?: string[];
 }
@@ -49,7 +54,7 @@ export interface AikenConstant {
   line: number;
   raw: string;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka" | "anastasia";
+  source: SourceType; // Changed from hardcoded union
   // For vodka library: track re-exported names
   reExportedAs?: string[];
 }
@@ -68,7 +73,7 @@ export interface AikenModule {
   privateConstants: AikenConstant[];
   content: string;
   dependencies: string[];
-  source: "stdlib" | "prelude" | "vodka" | "anastasia";
+  source: SourceType; // Changed from hardcoded union
   // For vodka library: track if this is a re-export file
   isReExportFile?: boolean;
 }
@@ -86,34 +91,7 @@ export interface AikenLibrary {
   privateConstants: Map<string, AikenConstant>;
   // Source statistics
   sourceStats: {
-    stdlib: {
-      modules: number;
-      functions: number;
-      atoms: number;
-      types: number;
-      privateTypes: number;
-      constants: number;
-      privateConstants: number;
-    };
-    prelude: {
-      modules: number;
-      functions: number;
-      atoms: number;
-      types: number;
-      privateTypes: number;
-      constants: number;
-      privateConstants: number;
-    };
-    vodka: {
-      modules: number;
-      functions: number;
-      atoms: number;
-      types: number;
-      privateTypes: number;
-      constants: number;
-      privateConstants: number;
-    };
-    anastasia: {
+    [K in SourceType]: {
       modules: number;
       functions: number;
       atoms: number;
@@ -130,5 +108,5 @@ export interface ParseOptions {
   includeComments?: boolean;
   followDependencies?: boolean;
   includePrivate?: boolean; // Whether to include private functions/types/constants
-  sources?: Array<"stdlib" | "prelude" | "vodka" | "anastasia">; // Which sources to analyze
+  sources?: SourceType[]; // Changed from hardcoded union
 }

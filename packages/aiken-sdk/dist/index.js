@@ -4,8 +4,10 @@ import { AikenSDK } from "./sdk.js";
 export { AikenSDK } from "./sdk.js";
 // Export parser utilities
 export { AikenParser } from "./parser.js";
-// Export a default instance creator
-export function createAikenSDK(stdlibPath, preludePath, vodkaPath, anastasiaPath) {
-    return new AikenSDK(stdlibPath, preludePath, vodkaPath, anastasiaPath);
+// Export registry
+export { PACKAGE_REGISTRY, getEnabledPackages, getPackageById, getSortedPackages, } from "./registry.js";
+// Updated factory function
+export function createAikenSDK(packageConfigs) {
+    return new AikenSDK(packageConfigs);
 }
 //# sourceMappingURL=index.js.map

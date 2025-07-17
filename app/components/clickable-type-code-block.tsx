@@ -1,4 +1,6 @@
 import { useState, useCallback } from "react";
+import { customTheme } from "./code-block";
+import { Highlight } from "prism-react-renderer";
 
 interface Type {
   fullName: string;
@@ -50,7 +52,7 @@ export default function ClickableTypeCodeBlock({
     );
 
     if (typeNames.length === 0) {
-      return <span>{code}</span>;
+      return null;
     }
 
     // Create regex pattern to match any of the type names
@@ -61,48 +63,8 @@ export default function ClickableTypeCodeBlock({
       "g"
     );
 
-    const parts = [];
-    let lastIndex = 0;
-    let match;
-
-    while ((match = pattern.exec(code)) !== null) {
-      // Add text before the match
-      if (match.index > lastIndex) {
-        parts.push(
-          <span key={`text-${lastIndex}`}>
-            {code.slice(lastIndex, match.index)}
-          </span>
-        );
-      }
-
-      // Add clickable type
-      const typeName = match[1];
-      const type = types.get(typeName);
-      if (type) {
-        parts.push(
-          <button
-            key={`type-${match.index}`}
-            onClick={() => onTypeClick(type.name)}
-            className="text-pink-400 hover:text-blue-300 hover:underline cursor-pointer bg-transparent border-none p-0 font-mono"
-            title={`Click to navigate to ${type.name}`}
-          >
-            {typeName}
-          </button>
-        );
-      }
-
-      lastIndex = match.index + match[0].length;
-    }
-
-    // Add remaining text
-    if (lastIndex < code.length) {
-      parts.push(
-        <span key={`text-${lastIndex}`}>{code.slice(lastIndex)}</span>
-      );
-    }
-
-    return <>{parts}</>;
-  }, [code, typeMap, onTypeClick]);
+    return { pattern, types };
+  }, [typeMap]);
 
   return (
     <div
@@ -116,11 +78,106 @@ export default function ClickableTypeCodeBlock({
           {copied ? "Copied!" : "Copy"}
         </button>
       </div>
-      <div className="p-4">
-        <pre className="text-neutral-300 font-mono text-sm overflow-x-auto">
-          {renderClickableCode()}
-        </pre>
-      </div>
+      <Highlight theme={customTheme} code={code.trim()} language="aiken">
+        {({ className, style, tokens, getLineProps, getTokenProps }) => {
+          const clickableData = renderClickableCode();
+
+          return (
+            <div className="">
+              <pre className="text-neutral-300 font-mono text-sm overflow-x-auto p-5 pr-20">
+                {tokens.map((line, i) => (
+                  <div
+                    key={i}
+                    {...getLineProps({ line })}
+                    className="table-row"
+                  >
+                    {line.map((token, key) => {
+                      const tokenProps = getTokenProps({ token });
+                      const tokenText = token.content;
+
+                      // Check if this token contains a clickable type
+                      if (
+                        clickableData &&
+                        clickableData.pattern.test(tokenText)
+                      ) {
+                        // Reset the regex for the next test
+                        clickableData.pattern.lastIndex = 0;
+
+                        // Find all matches in this token
+                        const matches = [];
+                        let match;
+                        while (
+                          (match = clickableData.pattern.exec(tokenText)) !==
+                          null
+                        ) {
+                          matches.push({
+                            typeName: match[1],
+                            start: match.index,
+                            end: match.index + match[0].length,
+                          });
+                        }
+
+                        if (matches.length > 0) {
+                          // Split the token into clickable and non-clickable parts
+                          const parts = [];
+                          let lastIndex = 0;
+
+                          matches.forEach((match, matchIndex) => {
+                            // Add text before the match
+                            if (match.start > lastIndex) {
+                              parts.push(
+                                <span
+                                  key={`text-${matchIndex}`}
+                                  {...tokenProps}
+                                >
+                                  {tokenText.slice(lastIndex, match.start)}
+                                </span>
+                              );
+                            }
+
+                            // Add clickable type
+                            const type = clickableData.types.get(
+                              match.typeName
+                            );
+                            if (type) {
+                              parts.push(
+                                <button
+                                  key={`type-${matchIndex}`}
+                                  onClick={() => onTypeClick(type.name)}
+                                  className="text-pink-400 hover:text-blue-300 hover:underline cursor-pointer bg-transparent border-none p-0 font-mono"
+                                  title={`Click to navigate to ${type.name}`}
+                                  style={tokenProps.style}
+                                >
+                                  {match.typeName}
+                                </button>
+                              );
+                            }
+
+                            lastIndex = match.end;
+                          });
+
+                          // Add remaining text
+                          if (lastIndex < tokenText.length) {
+                            parts.push(
+                              <span key="text-end" {...tokenProps}>
+                                {tokenText.slice(lastIndex)}
+                              </span>
+                            );
+                          }
+
+                          return <>{parts}</>;
+                        }
+                      }
+
+                      return <span key={key} {...tokenProps} />;
+                    })}
+                  </div>
+                ))}
+              </pre>
+            </div>
+          );
+        }}
+      </Highlight>
     </div>
   );
 }

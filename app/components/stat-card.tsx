@@ -9,8 +9,8 @@ interface StatCardProps {
 export default function StatCard({ title, items }: StatCardProps) {
   return (
     <div className="flex flex-col gap-2">
-      <h3 className="text-2xl font-bold flex items-center gap-2">
-        <IconCircleCheck className="w-10 h-10 text-pink-300" />
+      <h3 className="text-xl font-thin flex items-center gap-2">
+        <IconCircleCheck className="w-8 h-8 text-pink-300" />
         {title}
       </h3>
     </div>

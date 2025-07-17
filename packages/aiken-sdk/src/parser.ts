@@ -4,6 +4,7 @@ import {
   AikenType,
   AikenConstant,
   AikenParameter,
+  SourceType,
 } from "./types.js";
 
 export class AikenParser {
@@ -12,7 +13,7 @@ export class AikenParser {
    */
   static parseImports(
     content: string,
-    source: "stdlib" | "prelude" | "vodka" | "anastasia" = "stdlib"
+    source: SourceType = "stdlib"
   ): AikenImport[] {
     const imports: AikenImport[] = [];
     const lines = content.split("\n");
@@ -53,7 +54,7 @@ export class AikenParser {
    */
   static parseFunctions(
     content: string,
-    source: "stdlib" | "prelude" | "vodka" | "anastasia" = "stdlib"
+    source: SourceType = "stdlib"
   ): AikenFunction[] {
     const functions: AikenFunction[] = [];
     const lines = content.split("\n");
@@ -284,7 +285,7 @@ export class AikenParser {
    */
   static parseTypes(
     content: string,
-    source: "stdlib" | "prelude" | "vodka" | "anastasia" = "stdlib"
+    source: SourceType = "stdlib"
   ): AikenType[] {
     const types: AikenType[] = [];
     const lines = content.split("\n");
@@ -451,7 +452,7 @@ export class AikenParser {
    */
   static parseConstants(
     content: string,
-    source: "stdlib" | "prelude" | "vodka" | "anastasia" = "stdlib"
+    source: SourceType = "stdlib"
   ): AikenConstant[] {
     const constants: AikenConstant[] = [];
     const lines = content.split("\n");
@@ -615,10 +616,7 @@ export class AikenParser {
   /**
    * Check if a module is a re-export file for vodka library
    */
-  static isVodkaReExportFile(
-    moduleName: string,
-    source: "stdlib" | "prelude" | "vodka" | "anastasia"
-  ): boolean {
+  static isVodkaReExportFile(moduleName: string, source: SourceType): boolean {
     if (source !== "vodka") return false;
 
     // Main re-export files in vodka are cocktail.ak and mocktail.ak

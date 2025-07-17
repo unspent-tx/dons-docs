@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createAikenSDK } from "@dons-docs/aiken-sdk";
+import { createAikenSDK, getEnabledPackages } from "@dons-docs/aiken-sdk";
 import { join } from "path";
 
 let cachedData: any = null;
@@ -13,31 +13,26 @@ export async function GET() {
       return NextResponse.json(cachedData);
     }
 
-    // Get the correct paths from the project root
+    // Get enabled packages from registry
+    const enabledPackages = getEnabledPackages();
     const projectRoot = process.cwd();
-    const stdlibPath = join(projectRoot, "public/aiken-lib/aiken-stdlib");
-    const preludePath = join(projectRoot, "public/aiken-lib/aiken-prelude");
-    const vodkaPath = join(projectRoot, "public/aiken-lib/aiken-vodka");
-    const anastasiaPath = join(
-      projectRoot,
-      "public/aiken-lib/aiken-design-patterns"
-    );
 
-    // Initialize SDK with all four sources and correct paths
-    const sdk = createAikenSDK(
-      stdlibPath,
-      preludePath,
-      vodkaPath,
-      anastasiaPath
-    );
+    // Build package paths dynamically
+    const packagePaths = enabledPackages.reduce((acc, pkg) => {
+      acc[pkg.id] = join(projectRoot, pkg.publicPath);
+      return acc;
+    }, {} as Record<string, string>);
 
-    // Load library with all sources including anastasia
+    // Initialize SDK with registry
+    const sdk = createAikenSDK(enabledPackages);
+
+    // Load library with all enabled sources
     await sdk.loadLibrary({
-      sources: ["stdlib", "prelude", "vodka", "anastasia"],
+      sources: enabledPackages.map((pkg) => pkg.id),
       includePrivate: true,
     });
 
-    // Get data from all sources
+    // Get data from all sources (existing logic)
     const modules = sdk.getModules();
     const functions = sdk.getAllFunctions();
     const atoms = sdk.getAllAtoms();
@@ -47,7 +42,7 @@ export async function GET() {
     const privateConstants = sdk.getAllPrivateConstants();
     const stats = sdk.getStats();
 
-    // Convert Maps to arrays for JSON serialization
+    // Convert Maps to arrays for JSON serialization (existing logic)
     const data = {
       modules: Array.from(modules.entries()).map(([key, module]) => ({
         key,

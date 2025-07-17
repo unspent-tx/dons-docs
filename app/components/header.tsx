@@ -14,10 +14,10 @@ export default function Header({ stats, onRefresh, isLoading }: HeaderProps) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="">
             <h1 className="font-bold whitespace-nowrap text-7xl text-neutral-100">
-              Don's Docs
+              Dons Docs
             </h1>
           </div>
-          <StatsGrid stats={stats} />
+          {/* <StatsGrid stats={stats} /> */}
           {/* <div className="text-4xl font-mono text-neutral-400">
             {stats.totalModules} <span className="text-sm">modules</span> •{" "}
             {stats.totalFunctions} <span className="text-sm">functions</span> •{" "}

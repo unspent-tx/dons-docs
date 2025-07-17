@@ -33,34 +33,26 @@ export default function ModulesView({
   toggleCodeBlock,
 }: ModulesViewProps) {
   return (
-    <div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {modules.map((module) => (
-          <ItemCard key={module.key}>
-            <ItemHeader
-              name={module.name}
-              source={module.source}
-              badges={
-                module.isReExportFile
-                  ? [<span key="re-export">Re-export</span>]
-                  : undefined
-              }
-            />
-            <ItemMeta>
-              <div>
-                {module.functions.length} functions • {module.atoms.length}{" "}
-                atoms • {module.types.length} types
-              </div>
-            </ItemMeta>
+    <>
+      {modules.map((module) => (
+        <ItemCard key={module.key}>
+          <ItemHeader
+            name={module.name}
+            source={module.source}
+            badges={
+              module.isReExportFile
+                ? [<span key="re-export">Re-export</span>]
+                : undefined
+            }
+          />
+          <ItemMeta>
             <div>
-              <StatItem label="Functions" value={module.functions.length} />
-              <StatItem label="Atoms" value={module.atoms.length} />
-              <StatItem label="Types" value={module.types.length} />
-              <StatItem label="Constants" value={module.constants.length} />
+              {module.functions.length} functions • {module.atoms.length} atoms
+              • {module.types.length} types
             </div>
-          </ItemCard>
-        ))}
-      </div>
-    </div>
+          </ItemMeta>
+        </ItemCard>
+      ))}
+    </>
   );
 }

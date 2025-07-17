@@ -16,8 +16,8 @@ export default function ItemHeader({
   return (
     <div>
       <div>
-        <h4 className="text-3xl font-bold text-pink-300">{name}</h4>
         <SourceBadge source={source} />
+        <h4 className="text-xl font-bold text-pink-300">{name}</h4>
         {/* {badges &&
           badges.map((badge, index) => <span key={index}>{badge}</span>)} */}
       </div>

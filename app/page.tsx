@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { IconEye, IconEyeOff, IconChevronDown } from "@tabler/icons-react";
+import { IconChevronDown } from "@tabler/icons-react";
 import LoadingSpinner from "./components/loading-spinner";
 import ErrorMessage from "./components/error-message";
 import Header from "./components/header";
@@ -15,6 +15,12 @@ import AtomsView from "./components/atoms-view";
 import TypesView from "./components/types-view";
 import ConstantsView from "./components/constants-view";
 import Footer from "./components/footer";
+import GridToggleButton, {
+  getGridClasses,
+  GridSize,
+} from "./components/grid-toggle-button";
+import CodeBlocksToggleButton from "./components/code-blocks-toggle-button";
+import { SourceType, getSortedPackages } from "./lib/client-registry";
 
 interface LibraryData {
   stats: {
@@ -26,34 +32,7 @@ interface LibraryData {
     totalConstants: number;
     totalPrivateConstants: number;
     sourceStats: {
-      stdlib: {
-        modules: number;
-        functions: number;
-        atoms: number;
-        types: number;
-        privateTypes: number;
-        constants: number;
-        privateConstants: number;
-      };
-      prelude: {
-        modules: number;
-        functions: number;
-        atoms: number;
-        types: number;
-        privateTypes: number;
-        constants: number;
-        privateConstants: number;
-      };
-      vodka: {
-        modules: number;
-        functions: number;
-        atoms: number;
-        types: number;
-        privateTypes: number;
-        constants: number;
-        privateConstants: number;
-      };
-      anastasia: {
+      [K in SourceType]: {
         modules: number;
         functions: number;
         atoms: number;
@@ -67,7 +46,7 @@ interface LibraryData {
   modules: Array<{
     key: string;
     name: string;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     functions: number;
     atoms: number;
     types: number;
@@ -91,7 +70,7 @@ interface LibraryData {
     returnType: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
   }>;
   atoms: Array<{
@@ -107,7 +86,7 @@ interface LibraryData {
     returnType: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
   }>;
   types: Array<{
@@ -116,7 +95,7 @@ interface LibraryData {
     definition: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
   }>;
   privateTypes: Array<{
@@ -125,7 +104,7 @@ interface LibraryData {
     definition: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
   }>;
   constants: Array<{
@@ -135,7 +114,7 @@ interface LibraryData {
     value: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
   }>;
   privateConstants: Array<{
@@ -145,7 +124,7 @@ interface LibraryData {
     value: string;
     line: number;
     isPublic: boolean;
-    source: "stdlib" | "prelude" | "vodka" | "anastasia";
+    source: SourceType;
     reExportedAs?: string[];
   }>;
 }
@@ -158,9 +137,7 @@ export default function Home() {
     "modules" | "functions" | "atoms" | "types" | "constants"
   >("functions");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sourceFilter, setSourceFilter] = useState<
-    "all" | "stdlib" | "prelude" | "vodka" | "anastasia"
-  >("all");
+  const [sourceFilter, setSourceFilter] = useState<"all" | SourceType>("all");
 
   // Pagination state - track if we should show all results or just first 10
   const [showAll, setShowAll] = useState({
@@ -177,6 +154,9 @@ export default function Home() {
     new Set()
   );
 
+  // Grid size controls
+  const [gridSize, setGridSize] = useState<GridSize>("4");
+
   const toggleCodeBlock = (id: string) => {
     setExpandedCodeBlocks((prev) => {
       const newSet = new Set(prev);
@@ -189,10 +169,20 @@ export default function Home() {
     });
   };
 
-  const toggleGlobalCodeBlocks = () => {
+  const handleCodeBlocksToggle = (showCodeBlocks: boolean) => {
+    setShowCodeBlocksByDefault(showCodeBlocks);
+    // Clear individual expansions when toggling global setting
+    setExpandedCodeBlocks(new Set());
+  };
+
+  const handleSearchFiltersCodeBlocksToggle = () => {
     setShowCodeBlocksByDefault((prev) => !prev);
     // Clear individual expansions when toggling global setting
     setExpandedCodeBlocks(new Set());
+  };
+
+  const handleGridSizeChange = (newGridSize: GridSize) => {
+    setGridSize(newGridSize);
   };
 
   useEffect(() => {
@@ -512,47 +502,19 @@ export default function Home() {
       allFilteredPrivateTypes.length +
       allFilteredConstants.length +
       allFilteredPrivateConstants.length,
-    stdlib:
-      allFilteredModules.filter((item) => item.source === "stdlib").length +
-      allFilteredFunctions.filter((item) => item.source === "stdlib").length +
-      allFilteredAtoms.filter((item) => item.source === "stdlib").length +
-      allFilteredTypes.filter((item) => item.source === "stdlib").length +
-      allFilteredPrivateTypes.filter((item) => item.source === "stdlib")
-        .length +
-      allFilteredConstants.filter((item) => item.source === "stdlib").length +
-      allFilteredPrivateConstants.filter((item) => item.source === "stdlib")
-        .length,
-    prelude:
-      allFilteredModules.filter((item) => item.source === "prelude").length +
-      allFilteredFunctions.filter((item) => item.source === "prelude").length +
-      allFilteredAtoms.filter((item) => item.source === "prelude").length +
-      allFilteredTypes.filter((item) => item.source === "prelude").length +
-      allFilteredPrivateTypes.filter((item) => item.source === "prelude")
-        .length +
-      allFilteredConstants.filter((item) => item.source === "prelude").length +
-      allFilteredPrivateConstants.filter((item) => item.source === "prelude")
-        .length,
-    vodka:
-      allFilteredModules.filter((item) => item.source === "vodka").length +
-      allFilteredFunctions.filter((item) => item.source === "vodka").length +
-      allFilteredAtoms.filter((item) => item.source === "vodka").length +
-      allFilteredTypes.filter((item) => item.source === "vodka").length +
-      allFilteredPrivateTypes.filter((item) => item.source === "vodka").length +
-      allFilteredConstants.filter((item) => item.source === "vodka").length +
-      allFilteredPrivateConstants.filter((item) => item.source === "vodka")
-        .length,
-    anastasia:
-      allFilteredModules.filter((item) => item.source === "anastasia").length +
-      allFilteredFunctions.filter((item) => item.source === "anastasia")
-        .length +
-      allFilteredAtoms.filter((item) => item.source === "anastasia").length +
-      allFilteredTypes.filter((item) => item.source === "anastasia").length +
-      allFilteredPrivateTypes.filter((item) => item.source === "anastasia")
-        .length +
-      allFilteredConstants.filter((item) => item.source === "anastasia")
-        .length +
-      allFilteredPrivateConstants.filter((item) => item.source === "anastasia")
-        .length,
+    ...getSortedPackages().reduce((acc, pkg) => {
+      acc[pkg.id] =
+        allFilteredModules.filter((item) => item.source === pkg.id).length +
+        allFilteredFunctions.filter((item) => item.source === pkg.id).length +
+        allFilteredAtoms.filter((item) => item.source === pkg.id).length +
+        allFilteredTypes.filter((item) => item.source === pkg.id).length +
+        allFilteredPrivateTypes.filter((item) => item.source === pkg.id)
+          .length +
+        allFilteredConstants.filter((item) => item.source === pkg.id).length +
+        allFilteredPrivateConstants.filter((item) => item.source === pkg.id)
+          .length;
+      return acc;
+    }, {} as Record<SourceType, number>),
   };
 
   // Check if there are more items to load
@@ -576,16 +538,23 @@ export default function Home() {
         isLoading={loading}
       />
 
-      <div>
-        <div className="flex flex-wrap gap-3 items-center m-5">
-          <div className="flex flex-col gap-5 w-full">
+      <div className="bg-neutral-900/50 border border-neutral-700 rounded-lg p-6 mb-8">
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium text-neutral-300 mb-3">
+              I want to see
+            </h3>
             <TabNavigation
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               tabCounts={tabCounts}
             />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium text-neutral-300 mb-3">From</h3>
             <SearchFilters
-              toggleGlobalCodeBlocks={toggleGlobalCodeBlocks}
+              toggleGlobalCodeBlocks={handleSearchFiltersCodeBlocksToggle}
               showCodeBlocksByDefault={showCodeBlocksByDefault}
               expandedCodeBlocks={expandedCodeBlocks}
               searchQuery={searchQuery}
@@ -595,35 +564,52 @@ export default function Home() {
               sourceCounts={sourceCounts}
             />
           </div>
+          <div>
+            <h3 className="text-sm font-medium text-neutral-300 mb-3">
+              Showing
+            </h3>
+            <div className="flex gap-2">
+              <CodeBlocksToggleButton onToggle={handleCodeBlocksToggle} />
+              <GridToggleButton onGridSizeChange={handleGridSizeChange} />
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div className="overflow-x-auto">
-          {/* {activeTab === "overview" && <Overview />} */}
-          {activeTab === "modules" && (
+      <div className="overflow-x-auto">
+        {/* {activeTab === "overview" && <Overview />} */}
+        {activeTab === "modules" && (
+          <div className={getGridClasses(gridSize)}>
             <ModulesView
               modules={paginatedModules}
               showCodeBlocksByDefault={showCodeBlocksByDefault}
               expandedCodeBlocks={expandedCodeBlocks}
               toggleCodeBlock={toggleCodeBlock}
             />
-          )}
-          {activeTab === "functions" && (
+          </div>
+        )}
+        {activeTab === "functions" && (
+          <div className={getGridClasses(gridSize)}>
             <FunctionsView
               functions={paginatedFunctions}
               showCodeBlocksByDefault={showCodeBlocksByDefault}
               expandedCodeBlocks={expandedCodeBlocks}
               toggleCodeBlock={toggleCodeBlock}
             />
-          )}
-          {activeTab === "atoms" && (
+          </div>
+        )}
+        {activeTab === "atoms" && (
+          <div className={getGridClasses(gridSize)}>
             <AtomsView
               atoms={paginatedAtoms}
               showCodeBlocksByDefault={showCodeBlocksByDefault}
               expandedCodeBlocks={expandedCodeBlocks}
               toggleCodeBlock={toggleCodeBlock}
             />
-          )}
-          {activeTab === "types" && (
+          </div>
+        )}
+        {activeTab === "types" && (
+          <div className={getGridClasses(gridSize)}>
             <TypesView
               types={paginatedTypes}
               privateTypes={paginatedPrivateTypes}
@@ -631,8 +617,10 @@ export default function Home() {
               expandedCodeBlocks={expandedCodeBlocks}
               toggleCodeBlock={toggleCodeBlock}
             />
-          )}
-          {activeTab === "constants" && (
+          </div>
+        )}
+        {activeTab === "constants" && (
+          <div className={getGridClasses(gridSize)}>
             <ConstantsView
               constants={paginatedConstants}
               privateConstants={paginatedPrivateConstants}
@@ -640,32 +628,32 @@ export default function Home() {
               expandedCodeBlocks={expandedCodeBlocks}
               toggleCodeBlock={toggleCodeBlock}
             />
-          )}
-        </div>
-
-        {/* Universal Load More Button */}
-        {hasMore[activeTab] && (
-          <div className="text-center flex justify-center items-center mt-20 mb-40 ">
-            <button
-              onClick={() => loadMore(activeTab)}
-              className="button-1 px-6 py-2 flex items-center gap-1"
-            >
-              Load more {activeTab} (
-              {activeTab === "modules" && allFilteredModules.length - 10}
-              {activeTab === "functions" && allFilteredFunctions.length - 10}
-              {activeTab === "atoms" && allFilteredAtoms.length - 10}
-              {activeTab === "types" &&
-                allFilteredTypes.length + allFilteredPrivateTypes.length - 10}
-              {activeTab === "constants" &&
-                allFilteredConstants.length +
-                  allFilteredPrivateConstants.length -
-                  10}{" "}
-              remaining)
-              <IconChevronDown size={16} />
-            </button>
           </div>
         )}
       </div>
+
+      {/* Universal Load More Button */}
+      {hasMore[activeTab] && (
+        <div className="text-center flex justify-center items-center mt-20 mb-40 ">
+          <button
+            onClick={() => loadMore(activeTab)}
+            className="button-1 px-6 py-2 flex items-center gap-1"
+          >
+            Load more {activeTab} (
+            {activeTab === "modules" && allFilteredModules.length - 10}
+            {activeTab === "functions" && allFilteredFunctions.length - 10}
+            {activeTab === "atoms" && allFilteredAtoms.length - 10}
+            {activeTab === "types" &&
+              allFilteredTypes.length + allFilteredPrivateTypes.length - 10}
+            {activeTab === "constants" &&
+              allFilteredConstants.length +
+                allFilteredPrivateConstants.length -
+                10}{" "}
+            remaining)
+            <IconChevronDown size={16} />
+          </button>
+        </div>
+      )}
 
       <Footer />
     </div>

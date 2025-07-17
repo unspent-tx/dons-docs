@@ -17,14 +17,19 @@ export type {
   AikenModule,
   AikenLibrary,
   ParseOptions,
+  SourceType,
 } from "./types.js";
 
-// Export a default instance creator
-export function createAikenSDK(
-  stdlibPath?: string,
-  preludePath?: string,
-  vodkaPath?: string,
-  anastasiaPath?: string
-) {
-  return new AikenSDK(stdlibPath, preludePath, vodkaPath, anastasiaPath);
+// Export registry
+export {
+  PACKAGE_REGISTRY,
+  getEnabledPackages,
+  getPackageById,
+  getSortedPackages,
+} from "./registry.js";
+export type { PackageConfig } from "./registry.js";
+
+// Updated factory function
+export function createAikenSDK(packageConfigs?: any[]) {
+  return new AikenSDK(packageConfigs);
 }

@@ -1,11 +1,10 @@
-import { AikenModule, ParseOptions } from "./types.js";
+import { AikenModule, ParseOptions, SourceType } from "./types.js";
+import { PackageConfig } from "./registry.js";
 export declare class AikenSDK {
+    private packages;
     private library;
-    private stdlibPath;
-    private preludePath;
-    private vodkaPath;
-    private anastasiaPath;
-    constructor(stdlibPath?: string, preludePath?: string, vodkaPath?: string, anastasiaPath?: string);
+    constructor(packageConfigs?: PackageConfig[]);
+    private createEmptyLibrary;
     /**
      * Load and analyze Aiken libraries from multiple sources
      */
@@ -45,7 +44,7 @@ export declare class AikenSDK {
     /**
      * Get modules by source
      */
-    getModulesBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, AikenModule>;
+    getModulesBySource(source: SourceType): Map<string, AikenModule>;
     /**
      * Get a specific module by name
      */
@@ -61,11 +60,11 @@ export declare class AikenSDK {
     /**
      * Get functions by source
      */
-    getFunctionsBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, any>;
+    getFunctionsBySource(source: SourceType): Map<string, any>;
     /**
      * Get atoms by source
      */
-    getAtomsBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, any>;
+    getAtomsBySource(source: SourceType): Map<string, any>;
     /**
      * Get public functions by module name
      */
@@ -93,7 +92,7 @@ export declare class AikenSDK {
     /**
      * Get types by source
      */
-    getTypesBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, any>;
+    getTypesBySource(source: SourceType): Map<string, any>;
     /**
      * Get all public constants from all modules
      */
@@ -105,7 +104,7 @@ export declare class AikenSDK {
     /**
      * Get constants by source
      */
-    getConstantsBySource(source: "stdlib" | "prelude" | "vodka" | "anastasia"): Map<string, any>;
+    getConstantsBySource(source: SourceType): Map<string, any>;
     /**
      * Get dependency tree for a module
      */
@@ -127,34 +126,7 @@ export declare class AikenSDK {
         totalPrivateConstants: number;
         totalDependencies: number;
         sourceStats: {
-            stdlib: {
-                modules: number;
-                functions: number;
-                atoms: number;
-                types: number;
-                privateTypes: number;
-                constants: number;
-                privateConstants: number;
-            };
-            prelude: {
-                modules: number;
-                functions: number;
-                atoms: number;
-                types: number;
-                privateTypes: number;
-                constants: number;
-                privateConstants: number;
-            };
-            vodka: {
-                modules: number;
-                functions: number;
-                atoms: number;
-                types: number;
-                privateTypes: number;
-                constants: number;
-                privateConstants: number;
-            };
-            anastasia: {
+            [K in SourceType]: {
                 modules: number;
                 functions: number;
                 atoms: number;

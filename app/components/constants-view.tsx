@@ -34,26 +34,24 @@ export default function ConstantsView({
   const allConstants = [...constants, ...privateConstants];
 
   return (
-    <div>
-      <div>
-        {allConstants.map((constant) => (
-          <ItemCard key={constant.fullName}>
-            <ItemHeader
-              name={constant.name}
-              source={constant.source}
-              badges={
-                !constant.isPublic
-                  ? [<span key="private">Private</span>]
-                  : undefined
-              }
-              line={constant.line}
-            />
-            <ItemMeta fullName={constant.fullName} />
-            <CodeBlock code={`${constant.type} = ${constant.value}`} />
-            <ReExportBadge reExportedAs={constant.reExportedAs} />
-          </ItemCard>
-        ))}
-      </div>
-    </div>
+    <>
+      {allConstants.map((constant) => (
+        <ItemCard key={constant.fullName}>
+          <ItemHeader
+            name={constant.name}
+            source={constant.source}
+            badges={
+              !constant.isPublic
+                ? [<span key="private">Private</span>]
+                : undefined
+            }
+            line={constant.line}
+          />
+          <ItemMeta fullName={constant.fullName} />
+          <CodeBlock code={`${constant.type} = ${constant.value}`} />
+          <ReExportBadge reExportedAs={constant.reExportedAs} />
+        </ItemCard>
+      ))}
+    </>
   );
 }

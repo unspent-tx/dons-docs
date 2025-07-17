@@ -2,31 +2,51 @@ import { promises as fs } from "fs";
 import { join, dirname, basename, extname } from "path";
 import { fileURLToPath } from "url";
 import { AikenParser } from "./parser.js";
-import { AikenLibrary, AikenModule, ParseOptions } from "./types.js";
+import {
+  AikenLibrary,
+  AikenModule,
+  ParseOptions,
+  SourceType,
+} from "./types.js";
+import {
+  PACKAGE_REGISTRY,
+  PackageConfig,
+  getEnabledPackages,
+} from "./registry.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export class AikenSDK {
+  private packages: Map<string, PackageConfig>;
   private library: AikenLibrary;
-  private stdlibPath: string;
-  private preludePath: string;
-  private vodkaPath: string;
-  private anastasiaPath: string;
 
-  constructor(
-    stdlibPath?: string,
-    preludePath?: string,
-    vodkaPath?: string,
-    anastasiaPath?: string
-  ) {
-    this.stdlibPath = stdlibPath || join(__dirname, "../../aiken-stdlib");
-    this.preludePath =
-      preludePath || join(__dirname, "../../aiken-prelude/lib");
-    this.vodkaPath = vodkaPath || join(__dirname, "../../aiken-vodka/lib");
-    this.anastasiaPath =
-      anastasiaPath || join(__dirname, "../../aiken-design-patterns/lib");
-    this.library = {
+  constructor(packageConfigs?: PackageConfig[]) {
+    this.packages = new Map();
+    const configs = packageConfigs || getEnabledPackages();
+
+    configs.forEach((config) => {
+      this.packages.set(config.id, config);
+    });
+
+    this.library = this.createEmptyLibrary(configs);
+  }
+
+  private createEmptyLibrary(configs: PackageConfig[]): AikenLibrary {
+    const sourceStats: any = {};
+    configs.forEach((config) => {
+      sourceStats[config.id] = {
+        modules: 0,
+        functions: 0,
+        atoms: 0,
+        types: 0,
+        privateTypes: 0,
+        constants: 0,
+        privateConstants: 0,
+      };
+    });
+
+    return {
       modules: new Map(),
       dependencies: new Map(),
       // Public API
@@ -38,44 +58,7 @@ export class AikenSDK {
       privateTypes: new Map(),
       privateConstants: new Map(),
       // Source statistics
-      sourceStats: {
-        stdlib: {
-          modules: 0,
-          functions: 0,
-          atoms: 0,
-          types: 0,
-          privateTypes: 0,
-          constants: 0,
-          privateConstants: 0,
-        },
-        prelude: {
-          modules: 0,
-          functions: 0,
-          atoms: 0,
-          types: 0,
-          privateTypes: 0,
-          constants: 0,
-          privateConstants: 0,
-        },
-        vodka: {
-          modules: 0,
-          functions: 0,
-          atoms: 0,
-          types: 0,
-          privateTypes: 0,
-          constants: 0,
-          privateConstants: 0,
-        },
-        anastasia: {
-          modules: 0,
-          functions: 0,
-          atoms: 0,
-          types: 0,
-          privateTypes: 0,
-          constants: 0,
-          privateConstants: 0,
-        },
-      },
+      sourceStats,
     };
   }
 
@@ -83,41 +66,43 @@ export class AikenSDK {
    * Load and analyze Aiken libraries from multiple sources
    */
   async loadLibrary(options: ParseOptions = {}): Promise<void> {
-    const sources = options.sources || [
-      "stdlib",
-      "prelude",
-      "vodka",
-      "anastasia",
-    ];
+    const sources = options.sources || Array.from(this.packages.keys());
 
     console.log(`Loading Aiken libraries from sources: ${sources.join(", ")}`);
 
     // Clear existing data
     this.clearLibrary();
 
-    // Load stdlib if requested
-    if (sources.includes("stdlib")) {
-      await this.loadSourceLibrary("stdlib", this.stdlibPath, options);
+    // Load each package using existing parsing logic
+    for (const source of sources) {
+      const pkg = this.packages.get(source);
+      if (pkg && pkg.enabled) {
+        const sourcePath = join(process.cwd(), pkg.path);
+        await this.loadSourceLibrary(
+          source as SourceType, // Use source ID as SourceType
+          sourcePath,
+          options
+        );
+      }
     }
 
-    // Load prelude if requested
-    if (sources.includes("prelude")) {
-      await this.loadSourceLibrary("prelude", this.preludePath, options);
-    }
-
-    // Load vodka if requested
-    if (sources.includes("vodka")) {
-      await this.loadSourceLibrary("vodka", this.vodkaPath, options);
-    }
-
-    // Load anastasia if requested
-    if (sources.includes("anastasia")) {
-      await this.loadSourceLibrary("anastasia", this.anastasiaPath, options);
-    }
-
-    // Process vodka re-exports if vodka was loaded
-    if (sources.includes("vodka")) {
-      await this.processVodkaReExports();
+    // Apply custom parsing and post-processing for each package
+    for (const source of sources) {
+      const pkg = this.packages.get(source);
+      if (pkg?.customParsing?.postProcessing) {
+        for (const postProcess of pkg.customParsing.postProcessing) {
+          switch (postProcess) {
+            case "processVodkaReExports":
+              if (source === "vodka") {
+                await this.processVodkaReExports();
+              }
+              break;
+            // Add more post-processing steps as needed
+            default:
+              console.warn(`Unknown post-processing step: ${postProcess}`);
+          }
+        }
+      }
     }
 
     console.log(
@@ -141,49 +126,25 @@ export class AikenSDK {
     this.library.privateConstants.clear();
 
     // Reset source stats
-    this.library.sourceStats.stdlib = {
-      modules: 0,
-      functions: 0,
-      atoms: 0,
-      types: 0,
-      privateTypes: 0,
-      constants: 0,
-      privateConstants: 0,
-    };
-    this.library.sourceStats.prelude = {
-      modules: 0,
-      functions: 0,
-      atoms: 0,
-      types: 0,
-      privateTypes: 0,
-      constants: 0,
-      privateConstants: 0,
-    };
-    this.library.sourceStats.vodka = {
-      modules: 0,
-      functions: 0,
-      atoms: 0,
-      types: 0,
-      privateTypes: 0,
-      constants: 0,
-      privateConstants: 0,
-    };
-    this.library.sourceStats.anastasia = {
-      modules: 0,
-      functions: 0,
-      atoms: 0,
-      types: 0,
-      privateTypes: 0,
-      constants: 0,
-      privateConstants: 0,
-    };
+    const configs = getEnabledPackages();
+    configs.forEach((config) => {
+      this.library.sourceStats[config.id] = {
+        modules: 0,
+        functions: 0,
+        atoms: 0,
+        types: 0,
+        privateTypes: 0,
+        constants: 0,
+        privateConstants: 0,
+      };
+    });
   }
 
   /**
    * Load and analyze a specific source library
    */
   private async loadSourceLibrary(
-    source: "stdlib" | "prelude" | "vodka" | "anastasia",
+    source: SourceType,
     sourcePath: string,
     options: ParseOptions
   ): Promise<void> {
@@ -366,7 +327,7 @@ export class AikenSDK {
   private async parseFile(
     filePath: string,
     basePath: string,
-    source: "stdlib" | "prelude" | "vodka" | "anastasia",
+    source: SourceType,
     options: ParseOptions = {}
   ): Promise<AikenModule> {
     const content = await fs.readFile(filePath, "utf-8");
@@ -432,9 +393,7 @@ export class AikenSDK {
   /**
    * Get modules by source
    */
-  getModulesBySource(
-    source: "stdlib" | "prelude" | "vodka" | "anastasia"
-  ): Map<string, AikenModule> {
+  getModulesBySource(source: SourceType): Map<string, AikenModule> {
     const result = new Map<string, AikenModule>();
     this.library.modules.forEach((module, key) => {
       if (module.source === source) {
@@ -468,9 +427,7 @@ export class AikenSDK {
   /**
    * Get functions by source
    */
-  getFunctionsBySource(
-    source: "stdlib" | "prelude" | "vodka" | "anastasia"
-  ): Map<string, any> {
+  getFunctionsBySource(source: SourceType): Map<string, any> {
     const result = new Map();
     this.library.functions.forEach((func, key) => {
       if (func.source === source) {
@@ -483,9 +440,7 @@ export class AikenSDK {
   /**
    * Get atoms by source
    */
-  getAtomsBySource(
-    source: "stdlib" | "prelude" | "vodka" | "anastasia"
-  ): Map<string, any> {
+  getAtomsBySource(source: SourceType): Map<string, any> {
     const result = new Map();
     this.library.atoms.forEach((atom, key) => {
       if (atom.source === source) {
@@ -560,9 +515,7 @@ export class AikenSDK {
   /**
    * Get types by source
    */
-  getTypesBySource(
-    source: "stdlib" | "prelude" | "vodka" | "anastasia"
-  ): Map<string, any> {
+  getTypesBySource(source: SourceType): Map<string, any> {
     const result = new Map();
     this.library.types.forEach((type, key) => {
       if (type.source === source) {
@@ -589,9 +542,7 @@ export class AikenSDK {
   /**
    * Get constants by source
    */
-  getConstantsBySource(
-    source: "stdlib" | "prelude" | "vodka" | "anastasia"
-  ): Map<string, any> {
+  getConstantsBySource(source: SourceType): Map<string, any> {
     const result = new Map();
     this.library.constants.forEach((constant, key) => {
       if (constant.source === source) {
@@ -650,34 +601,7 @@ export class AikenSDK {
     totalPrivateConstants: number;
     totalDependencies: number;
     sourceStats: {
-      stdlib: {
-        modules: number;
-        functions: number;
-        atoms: number;
-        types: number;
-        privateTypes: number;
-        constants: number;
-        privateConstants: number;
-      };
-      prelude: {
-        modules: number;
-        functions: number;
-        atoms: number;
-        types: number;
-        privateTypes: number;
-        constants: number;
-        privateConstants: number;
-      };
-      vodka: {
-        modules: number;
-        functions: number;
-        atoms: number;
-        types: number;
-        privateTypes: number;
-        constants: number;
-        privateConstants: number;
-      };
-      anastasia: {
+      [K in SourceType]: {
         modules: number;
         functions: number;
         atoms: number;

@@ -9,6 +9,7 @@ import {
   IconBracketsOff,
   IconBrackets,
 } from "@tabler/icons-react";
+import { getSortedPackages, SourceType } from "../lib/client-registry";
 
 interface SearchFiltersProps {
   toggleGlobalCodeBlocks: () => void;
@@ -16,17 +17,9 @@ interface SearchFiltersProps {
   expandedCodeBlocks: Set<string>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  sourceFilter: "all" | "stdlib" | "prelude" | "vodka" | "anastasia";
-  setSourceFilter: (
-    filter: "all" | "stdlib" | "prelude" | "vodka" | "anastasia"
-  ) => void;
-  sourceCounts: {
-    all: number;
-    stdlib: number;
-    prelude: number;
-    vodka: number;
-    anastasia: number;
-  };
+  sourceFilter: "all" | SourceType;
+  setSourceFilter: (filter: "all" | SourceType) => void;
+  sourceCounts: Record<string, number>;
 }
 
 export default function SearchFilters({
@@ -39,58 +32,54 @@ export default function SearchFilters({
   setSourceFilter,
   sourceCounts,
 }: SearchFiltersProps) {
+  const getIconForPackage = (iconName?: string) => {
+    switch (iconName) {
+      case "IconBook":
+        return IconBook;
+      case "IconCode":
+        return IconCode;
+      case "IconBrandTabler":
+        return IconBrandTabler;
+      default:
+        return IconCode;
+    }
+  };
+
   const sourceOptions = [
     { value: "all", label: "All Sources", icon: IconPackage },
-    { value: "stdlib", label: "Standard Library", icon: IconBook },
-    { value: "prelude", label: "Prelude", icon: IconCode },
-    { value: "vodka", label: "Vodka", icon: IconBrandTabler },
-    { value: "anastasia", label: "Anastasia Design Patterns", icon: IconCode },
-  ] as const;
+    ...getSortedPackages().map((pkg) => ({
+      value: pkg.id,
+      label: pkg.name,
+      icon: getIconForPackage(pkg.icon),
+    })),
+  ];
 
   return (
-    <div className="flex flex-col gap-5 w-full">
-      <div>
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={toggleGlobalCodeBlocks}
-            className={`max-w-44 px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${
-              !showCodeBlocksByDefault
-                ? "button-1"
-                : "button-1 !bg-neutral-900 !text-pink-300"
-            }`}
-          >
-            {showCodeBlocksByDefault ? (
-              <>
-                <IconBracketsOff size={16} />
-                Hide code
-              </>
-            ) : (
-              <>
-                <IconBrackets size={16} />
-                Show code
-              </>
-            )}
-          </button>
-          {sourceOptions.map((option) => {
-            const IconComponent = option.icon;
-            return (
-              <button
-                key={option.value}
-                onClick={() => setSourceFilter(option.value)}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                  sourceFilter === option.value
-                    ? "button-1"
-                    : "button-1 !bg-neutral-900 !text-pink-300"
-                }`}
-              >
-                <IconComponent size={16} />
-                {option.label} ({sourceCounts[option.value]})
-              </button>
-            );
-          })}
-        </div>
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-3">
+        {sourceOptions.map((option) => {
+          const IconComponent = option.icon;
+          return (
+            <button
+              key={option.value}
+              onClick={() =>
+                setSourceFilter(option.value as "all" | SourceType)
+              }
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                sourceFilter === option.value
+                  ? "button-1"
+                  : "button-1 !bg-neutral-900 !text-pink-300"
+              }`}
+            >
+              <IconComponent size={16} />
+              {option.label} ({sourceCounts[option.value] || 0})
+            </button>
+          );
+        })}
       </div>
-      <div className=" w-full relative">
+      <h3 className="text-sm font-medium text-neutral-300 mb-3">Filter</h3>
+
+      <div className="w-full relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <IconSearch size={20} className="text-gray-400" />
         </div>
