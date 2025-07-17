@@ -218,6 +218,12 @@ export default function Home() {
       }
 
       const result = await response.json();
+
+      // Log debug info from API
+      if (result.debugInfo) {
+        console.log("API Debug Info:", result.debugInfo);
+      }
+
       setData(result);
     } catch (err) {
       console.error("Error fetching data:", err);

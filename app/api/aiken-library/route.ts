@@ -17,15 +17,14 @@ export async function GET() {
     const enabledPackages = getEnabledPackages();
     const projectRoot = process.cwd();
 
-    console.log("Project root:", projectRoot);
-    console.log(
-      "Enabled packages:",
-      enabledPackages.map((p) => ({
+    const debugInfo: any = {
+      projectRoot,
+      enabledPackages: enabledPackages.map((p) => ({
         id: p.id,
         path: p.path,
         publicPath: p.publicPath,
-      }))
-    );
+      })),
+    };
 
     // Create modified package configs that use public paths for production compatibility
     const productionPackages = enabledPackages.map((pkg) => ({
@@ -33,10 +32,10 @@ export async function GET() {
       path: pkg.publicPath, // Use publicPath instead of path for production
     }));
 
-    console.log(
-      "Production packages:",
-      productionPackages.map((p) => ({ id: p.id, path: p.path }))
-    );
+    debugInfo.productionPackages = productionPackages.map((p) => ({
+      id: p.id,
+      path: p.path,
+    }));
 
     // Initialize SDK with modified registry that uses public paths
     const sdk = createAikenSDK(productionPackages);
@@ -57,7 +56,7 @@ export async function GET() {
     const privateConstants = sdk.getAllPrivateConstants();
     const stats = sdk.getStats();
 
-    console.log("Loaded data:", {
+    debugInfo.loadedData = {
       modules: modules.size,
       functions: functions.size,
       atoms: atoms.size,
@@ -66,7 +65,7 @@ export async function GET() {
       constants: constants.size,
       privateConstants: privateConstants.size,
       stats,
-    });
+    };
 
     // Convert Maps to arrays for JSON serialization (existing logic)
     const data = {
@@ -113,7 +112,7 @@ export async function GET() {
     cachedData = data;
     lastCacheTime = Date.now();
 
-    return NextResponse.json(data);
+    return NextResponse.json({ ...data, debugInfo });
   } catch (error) {
     console.error("Error loading Aiken library:", error);
     return NextResponse.json(
