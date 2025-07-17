@@ -4,11 +4,31 @@ const path = require("path");
 async function generateAikenData() {
   try {
     console.log("🔍 Generating Aiken library data...");
+    console.log("Current working directory:", process.cwd());
+    console.log("Node version:", process.version);
 
-    // Import the SDK dynamically
-    const { createAikenSDK, getEnabledPackages } = await import(
-      "../packages/aiken-sdk/dist/index.js"
-    );
+    // Check if SDK dist exists
+    const sdkPath = path.resolve("../packages/aiken-sdk/dist/index.js");
+    console.log("SDK path:", sdkPath);
+    console.log("SDK exists:", fs.existsSync(sdkPath));
+
+    if (!fs.existsSync(sdkPath)) {
+      console.error("❌ SDK dist not found. Building SDK first...");
+      const { execSync } = require("child_process");
+      execSync("npm run build-sdk", { stdio: "inherit" });
+    }
+
+    // Import the SDK dynamically with better error handling
+    let createAikenSDK, getEnabledPackages;
+    try {
+      const sdkModule = await import("../packages/aiken-sdk/dist/index.js");
+      createAikenSDK = sdkModule.createAikenSDK;
+      getEnabledPackages = sdkModule.getEnabledPackages;
+      console.log("✅ SDK imported successfully");
+    } catch (importError) {
+      console.error("❌ Failed to import SDK:", importError);
+      throw importError;
+    }
 
     // Get enabled packages from registry
     const enabledPackages = getEnabledPackages();
@@ -19,10 +39,49 @@ async function generateAikenData() {
       enabledPackages.map((p) => p.id)
     );
 
+    // Log package details for debugging
+    enabledPackages.forEach((pkg) => {
+      const fullPath = path.join(projectRoot, pkg.path);
+      const exists = fs.existsSync(fullPath);
+      console.log(`Package ${pkg.id}:`, {
+        path: pkg.path,
+        fullPath,
+        exists,
+        enabled: pkg.enabled,
+      });
+
+      // If package doesn't exist, try alternative paths for production
+      if (!exists) {
+        console.warn(`⚠️ Package ${pkg.id} not found at ${fullPath}`);
+
+        // Try alternative paths for production builds
+        const altPaths = [
+          path.join(projectRoot, "..", pkg.path),
+          path.join(projectRoot, "..", "..", pkg.path),
+          path.join(process.cwd(), pkg.path),
+        ];
+
+        for (const altPath of altPaths) {
+          if (fs.existsSync(altPath)) {
+            console.log(
+              `✅ Found package ${pkg.id} at alternative path: ${altPath}`
+            );
+            // Update the package path for this run
+            pkg.path = altPath.replace(projectRoot, "").replace(/^\//, "");
+            break;
+          }
+        }
+      }
+    });
+
     // Initialize SDK with packages (using original paths for build-time parsing)
     const sdk = createAikenSDK(enabledPackages);
 
     // Load library with all enabled sources
+    console.log(
+      "Loading library with sources:",
+      enabledPackages.map((pkg) => pkg.id)
+    );
     await sdk.loadLibrary({
       sources: enabledPackages.map((pkg) => pkg.id),
       includePrivate: true,
@@ -47,6 +106,31 @@ async function generateAikenData() {
       constants: constants.size,
       privateConstants: privateConstants.size,
     });
+
+    // Log module sources for debugging
+    const moduleSources = new Map();
+    modules.forEach((module, key) => {
+      const source = key.split(":")[0];
+      moduleSources.set(source, (moduleSources.get(source) || 0) + 1);
+    });
+    console.log("Modules by source:", Object.fromEntries(moduleSources));
+
+    // Validate that all expected packages are present
+    const expectedSources = enabledPackages.map((pkg) => pkg.id);
+    const actualSources = Array.from(moduleSources.keys());
+    const missingSources = expectedSources.filter(
+      (source) => !actualSources.includes(source)
+    );
+
+    if (missingSources.length > 0) {
+      console.warn(
+        `⚠️ Missing packages in generated data: ${missingSources.join(", ")}`
+      );
+      console.warn("Expected sources:", expectedSources);
+      console.warn("Actual sources:", actualSources);
+    } else {
+      console.log("✅ All expected packages are present in generated data");
+    }
 
     // Convert Maps to arrays for JSON serialization (same logic as API route)
     const data = {
@@ -111,6 +195,7 @@ async function generateAikenData() {
     });
   } catch (error) {
     console.error("❌ Error generating Aiken data:", error);
+    console.error("Stack trace:", error.stack);
     process.exit(1);
   }
 }

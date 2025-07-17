@@ -77,12 +77,24 @@ export class AikenSDK {
     for (const source of sources) {
       const pkg = this.packages.get(source);
       if (pkg && pkg.enabled) {
-        const sourcePath = join(process.cwd(), pkg.path);
-        await this.loadSourceLibrary(
-          source as SourceType, // Use source ID as SourceType
-          sourcePath,
-          options
-        );
+        try {
+          const sourcePath = join(process.cwd(), pkg.path);
+          console.log(`Processing package ${source} at path: ${sourcePath}`);
+          await this.loadSourceLibrary(
+            source as SourceType, // Use source ID as SourceType
+            sourcePath,
+            options
+          );
+          console.log(`✅ Successfully processed package ${source}`);
+        } catch (error) {
+          console.error(`❌ Error processing package ${source}:`, error);
+          if (error instanceof Error) {
+            console.error(`Stack trace for ${source}:`, error.stack);
+          }
+          // Continue with other packages instead of failing completely
+        }
+      } else {
+        console.warn(`⚠️ Package ${source} not found or disabled`);
       }
     }
 
