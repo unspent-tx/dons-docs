@@ -222,6 +222,8 @@ export default function Home() {
       // Log debug info from API
       if (result.debugInfo) {
         console.log("API Debug Info:", result.debugInfo);
+      } else {
+        console.log("No debug info found");
       }
 
       setData(result);
