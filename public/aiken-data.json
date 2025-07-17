@@ -12408,7 +12408,7 @@
         },
         {
           "name": "flip",
-          "signature": "pubTEST fn flip(f: fn(a, b) -> c) -> fn(b, a) -> c {",
+          "signature": "pub fn flip(f: fn(a, b) -> c) -> fn(b, a) -> c {",
           "documentation": "<small>Minimum Plutus Version</small> | <small>1</small>\n---                                   | ---\n\nA function that flips the arguments of a function.\n\n```aiken\npub fn titleize(left: String, right: String) {}\n\ntitleize(\"Hello\", \"World\") // \"Hello, World!\"\n\nflip(titleize)(\"Hello\", \"World\") // \"World, Hello!\"\n```",
           "parameters": [
             {
