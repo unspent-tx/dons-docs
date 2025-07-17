@@ -1,0 +1,3 @@
+[submodule "packages/aiken-design-patterns"]
+	path = packages/aiken-design-patterns
+	url = https://github.com/Anastasia-Labs/aiken-design-patterns.git
