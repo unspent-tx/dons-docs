@@ -26,11 +26,23 @@ export async function GET() {
       })),
     };
 
-    // Create modified package configs that use public paths for production compatibility
-    const productionPackages = enabledPackages.map((pkg) => ({
-      ...pkg,
-      path: pkg.publicPath, // Use publicPath instead of path for production
-    }));
+    // Try both paths - first public, then fallback to packages
+    const productionPackages = enabledPackages.map((pkg) => {
+      const fs = require("fs");
+      const publicPath = path.join(projectRoot, pkg.publicPath);
+      const packagePath = path.join(projectRoot, pkg.path);
+
+      // Check if public path exists, otherwise use package path
+      const usePublicPath = fs.existsSync(publicPath);
+      console.log(
+        `${pkg.id}: public path exists: ${usePublicPath} (${publicPath})`
+      );
+
+      return {
+        ...pkg,
+        path: usePublicPath ? pkg.publicPath : pkg.path,
+      };
+    });
 
     debugInfo.productionPackages = productionPackages.map((p) => ({
       id: p.id,
@@ -40,26 +52,29 @@ export async function GET() {
     // Initialize SDK with modified registry that uses public paths
     const sdk = createAikenSDK(productionPackages);
 
-    // Test if files exist at the expected paths
+    // Check what directories actually exist in Lambda
     const fs = require("fs");
     const path = require("path");
 
-    for (const pkg of productionPackages) {
-      const fullPath = path.join(projectRoot, pkg.path);
-      const exists = fs.existsSync(fullPath);
-      console.log(`Path check: ${fullPath} - exists: ${exists}`);
+    console.log("=== LAMBDA FILE SYSTEM DEBUG ===");
+    console.log("Project root contents:", fs.readdirSync(projectRoot));
 
-      if (exists) {
-        try {
-          const files = fs.readdirSync(fullPath);
-          console.log(`Files in ${pkg.id}:`, files.slice(0, 5)); // Show first 5 files
-        } catch (err) {
-          console.log(
-            `Error reading ${pkg.id}:`,
-            err instanceof Error ? err.message : "Unknown error"
-          );
-        }
-      }
+    if (fs.existsSync(path.join(projectRoot, "public"))) {
+      console.log(
+        "Public directory contents:",
+        fs.readdirSync(path.join(projectRoot, "public"))
+      );
+    } else {
+      console.log("Public directory does not exist!");
+    }
+
+    if (fs.existsSync(path.join(projectRoot, "packages"))) {
+      console.log(
+        "Packages directory contents:",
+        fs.readdirSync(path.join(projectRoot, "packages"))
+      );
+    } else {
+      console.log("Packages directory does not exist!");
     }
 
     // Load library with all enabled sources
