@@ -40,6 +40,28 @@ export async function GET() {
     // Initialize SDK with modified registry that uses public paths
     const sdk = createAikenSDK(productionPackages);
 
+    // Test if files exist at the expected paths
+    const fs = require("fs");
+    const path = require("path");
+
+    for (const pkg of productionPackages) {
+      const fullPath = path.join(projectRoot, pkg.path);
+      const exists = fs.existsSync(fullPath);
+      console.log(`Path check: ${fullPath} - exists: ${exists}`);
+
+      if (exists) {
+        try {
+          const files = fs.readdirSync(fullPath);
+          console.log(`Files in ${pkg.id}:`, files.slice(0, 5)); // Show first 5 files
+        } catch (err) {
+          console.log(
+            `Error reading ${pkg.id}:`,
+            err instanceof Error ? err.message : "Unknown error"
+          );
+        }
+      }
+    }
+
     // Load library with all enabled sources
     await sdk.loadLibrary({
       sources: enabledPackages.map((pkg) => pkg.id),
@@ -66,6 +88,32 @@ export async function GET() {
       privateConstants: privateConstants.size,
       stats,
     };
+
+    // Add file existence checks to debug info
+    debugInfo.fileChecks = [];
+    for (const pkg of productionPackages) {
+      const fullPath = path.join(projectRoot, pkg.path);
+      const exists = fs.existsSync(fullPath);
+      const fileCheck: any = {
+        package: pkg.id,
+        path: fullPath,
+        exists,
+        files: [],
+      };
+
+      if (exists) {
+        try {
+          const files = fs.readdirSync(fullPath);
+          fileCheck.files = files.slice(0, 10); // Show first 10 files
+        } catch (err) {
+          fileCheck.files = [
+            `Error: ${err instanceof Error ? err.message : "Unknown error"}`,
+          ];
+        }
+      }
+
+      debugInfo.fileChecks.push(fileCheck);
+    }
 
     // Convert Maps to arrays for JSON serialization (existing logic)
     const data = {
