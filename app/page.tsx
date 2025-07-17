@@ -21,6 +21,7 @@ import GridToggleButton, {
 } from "./components/grid-toggle-button";
 import CodeBlocksToggleButton from "./components/code-blocks-toggle-button";
 import { SourceType, getSortedPackages } from "./lib/client-registry";
+import { loadAikenData, type AikenData } from "./lib/data";
 
 interface LibraryData {
   stats: {
@@ -130,7 +131,7 @@ interface LibraryData {
 }
 
 export default function Home() {
-  const [data, setData] = useState<LibraryData | null>(null);
+  const [data, setData] = useState<AikenData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
@@ -211,21 +212,7 @@ export default function Home() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch("/api/aiken-library");
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      // Log debug info from API
-      if (result.debugInfo) {
-        console.log("API Debug Info:", result.debugInfo);
-      } else {
-        console.log("No debug info found");
-      }
-
+      const result = await loadAikenData();
       setData(result);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -238,7 +225,6 @@ export default function Home() {
   const handleRefresh = async () => {
     try {
       setLoading(true);
-      await fetch("/api/aiken-library", { method: "POST" });
       await fetchData();
     } catch (err) {
       console.error("Error refreshing data:", err);

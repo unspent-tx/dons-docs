@@ -33,12 +33,13 @@
     "npm": ">=9.0.0"
   },
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "npm run build-sdk && node scripts/generate-aiken-data.js && next build",
+    "dev": "npm run generate-data && next dev --turbopack",
+    "build": "npm run build-sdk && npm run generate-data && next build",
     "start": "next start",
     "lint": "next lint",
     "demo-aiken": "tsx demo-aiken-sdk.ts",
-    "build-sdk": "cd packages/aiken-sdk && npm run build"
+    "build-sdk": "cd packages/aiken-sdk && npm run build",
+    "generate-data": "node scripts/generate-aiken-data.js"
   },
   "dependencies": {
     "@dons-docs/aiken-sdk": "file:./packages/aiken-sdk",
