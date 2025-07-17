@@ -38,7 +38,7 @@ export const PACKAGE_REGISTRY = [
     },
     {
         id: "anastasia",
-        name: "Design Patterns",
+        name: "Anastasia Patterns",
         description: "Anastasia Labs design patterns",
         icon: "IconCode",
         path: "packages/aiken-design-patterns/lib",

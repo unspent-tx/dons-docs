@@ -17,14 +17,14 @@ export async function GET() {
     const enabledPackages = getEnabledPackages();
     const projectRoot = process.cwd();
 
-    // Build package paths dynamically
-    const packagePaths = enabledPackages.reduce((acc, pkg) => {
-      acc[pkg.id] = join(projectRoot, pkg.publicPath);
-      return acc;
-    }, {} as Record<string, string>);
+    // Create modified package configs that use public paths for production compatibility
+    const productionPackages = enabledPackages.map((pkg) => ({
+      ...pkg,
+      path: pkg.publicPath, // Use publicPath instead of path for production
+    }));
 
-    // Initialize SDK with registry
-    const sdk = createAikenSDK(enabledPackages);
+    // Initialize SDK with modified registry that uses public paths
+    const sdk = createAikenSDK(productionPackages);
 
     // Load library with all enabled sources
     await sdk.loadLibrary({
