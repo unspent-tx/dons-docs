@@ -1,0 +1,15 @@
+{
+  "name": "@dons-docs/aiken-prelude",
+  "version": "1.0.0",
+  "description": "Aiken prelude library",
+  "main": "lib/aiken.ak",
+  "files": [
+    "lib/**/*"
+  ],
+  "keywords": [
+    "aiken",
+    "prelude",
+    "cardano"
+  ],
+  "license": "MIT"
+}

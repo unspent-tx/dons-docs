@@ -128,6 +128,32 @@ async function generateAikenData() {
       );
       console.warn("Expected sources:", expectedSources);
       console.warn("Actual sources:", actualSources);
+
+      // Check if this is likely a submodule issue
+      const submodulePackages = missingSources.filter((source) =>
+        ["anastasia"].includes(source)
+      );
+
+      if (submodulePackages.length > 0) {
+        console.warn(
+          "💡 This appears to be a git submodule issue. Ensure submodules are fetched:"
+        );
+        console.warn("   git submodule update --init --recursive");
+      }
+
+      // Ensure we have at least some data
+      if (actualSources.length === 0) {
+        console.error(
+          "❌ No packages were successfully loaded. Build may fail."
+        );
+        console.error(
+          "   Please check that all required packages are available."
+        );
+      } else {
+        console.log(
+          `✅ Continuing with ${actualSources.length} available packages`
+        );
+      }
     } else {
       console.log("✅ All expected packages are present in generated data");
     }

@@ -1,0 +1,15 @@
+{
+  "name": "@dons-docs/aiken-vodka",
+  "version": "1.0.0",
+  "description": "Aiken vodka library",
+  "main": "lib/cocktail.ak",
+  "files": [
+    "lib/**/*"
+  ],
+  "keywords": [
+    "aiken",
+    "vodka",
+    "cardano"
+  ],
+  "license": "MIT"
+}
