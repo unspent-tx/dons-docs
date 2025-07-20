@@ -20,6 +20,8 @@ import GridToggleButton, {
   GridSize,
 } from "./components/grid-toggle-button";
 import CodeBlocksToggleButton from "./components/code-blocks-toggle-button";
+import ImportsToggleButton from "./components/imports-toggle-button";
+import FileStructureSidebar from "./components/file-structure-sidebar";
 import { SourceType, getSortedPackages } from "./lib/client-registry";
 import { loadAikenData, type AikenData } from "./lib/data";
 
@@ -139,15 +141,7 @@ export default function Home() {
   >("functions");
   const [searchQuery, setSearchQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<"all" | SourceType>("all");
-
-  // Pagination state - track if we should show all results or just first 10
-  const [showAll, setShowAll] = useState({
-    modules: false,
-    functions: false,
-    atoms: false,
-    types: false,
-    constants: false,
-  });
+  const [moduleFilter, setModuleFilter] = useState<string>("");
 
   // Code block visibility controls
   const [showCodeBlocksByDefault, setShowCodeBlocksByDefault] = useState(true);
@@ -155,11 +149,32 @@ export default function Home() {
     new Set()
   );
 
+  // Import block visibility controls
+  const [showImportsByDefault, setShowImportsByDefault] = useState(true);
+  const [expandedImports, setExpandedImports] = useState<Set<string>>(
+    new Set()
+  );
+
   // Grid size controls
   const [gridSize, setGridSize] = useState<GridSize>("4");
 
+  // Sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   const toggleCodeBlock = (id: string) => {
     setExpandedCodeBlocks((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleImportBlock = (id: string) => {
+    setExpandedImports((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -176,10 +191,22 @@ export default function Home() {
     setExpandedCodeBlocks(new Set());
   };
 
+  const handleImportsToggle = (showImports: boolean) => {
+    setShowImportsByDefault(showImports);
+    // Clear individual expansions when toggling global setting
+    setExpandedImports(new Set());
+  };
+
   const handleSearchFiltersCodeBlocksToggle = () => {
     setShowCodeBlocksByDefault((prev) => !prev);
     // Clear individual expansions when toggling global setting
     setExpandedCodeBlocks(new Set());
+  };
+
+  const handleSearchFiltersImportsToggle = () => {
+    setShowImportsByDefault((prev) => !prev);
+    // Clear individual expansions when toggling global setting
+    setExpandedImports(new Set());
   };
 
   const handleGridSizeChange = (newGridSize: GridSize) => {
@@ -189,24 +216,6 @@ export default function Home() {
   useEffect(() => {
     fetchData();
   }, []);
-
-  // Reset pagination when search query or source filter changes
-  useEffect(() => {
-    setShowAll({
-      modules: false,
-      functions: false,
-      atoms: false,
-      types: false,
-      constants: false,
-    });
-  }, [searchQuery, sourceFilter]);
-
-  const loadMore = (tab: keyof typeof showAll) => {
-    setShowAll((prev) => ({
-      ...prev,
-      [tab]: true,
-    }));
-  };
 
   const fetchData = async () => {
     try {
@@ -234,12 +243,33 @@ export default function Home() {
     }
   };
 
-  const filterItems = (items: any[], query: string, sourceFilter: string) => {
+  const filterItems = (
+    items: any[],
+    query: string,
+    sourceFilter: string,
+    moduleFilter: string = ""
+  ) => {
     let filtered = items;
 
     // Apply source filter
     if (sourceFilter !== "all") {
       filtered = filtered.filter((item) => item.source === sourceFilter);
+    }
+
+    // Apply module filter
+    if (moduleFilter) {
+      filtered = filtered.filter((item) => {
+        // Check if the item belongs to the specified module
+        // For functions, atoms, types, constants, check if their fullName starts with the module
+        if (item.fullName) {
+          return item.fullName.startsWith(moduleFilter);
+        }
+        // For modules themselves, check if the key matches
+        if (item.key) {
+          return item.key === moduleFilter;
+        }
+        return false;
+      });
     }
 
     // Apply search query
@@ -422,59 +452,44 @@ export default function Home() {
   const allFilteredModules = filterItems(
     data.modules,
     searchQuery,
-    sourceFilter
+    sourceFilter,
+    moduleFilter
   );
   const allFilteredFunctions = filterItems(
     data.functions,
     searchQuery,
-    sourceFilter
+    sourceFilter,
+    moduleFilter
   );
-  const allFilteredAtoms = filterItems(data.atoms, searchQuery, sourceFilter);
-  const allFilteredTypes = filterItems(data.types, searchQuery, sourceFilter);
+  const allFilteredAtoms = filterItems(
+    data.atoms,
+    searchQuery,
+    sourceFilter,
+    moduleFilter
+  );
+  const allFilteredTypes = filterItems(
+    data.types,
+    searchQuery,
+    sourceFilter,
+    moduleFilter
+  );
   const allFilteredPrivateTypes = filterItems(
     data.privateTypes,
     searchQuery,
-    sourceFilter
+    sourceFilter,
+    moduleFilter
   );
   const allFilteredConstants = filterItems(
     data.constants,
     searchQuery,
-    sourceFilter
+    sourceFilter,
+    moduleFilter
   );
   const allFilteredPrivateConstants = filterItems(
     data.privateConstants,
     searchQuery,
-    sourceFilter
-  );
-
-  // Apply pagination limits
-  const paginatedModules = allFilteredModules.slice(
-    0,
-    showAll.modules ? allFilteredModules.length : 10
-  );
-  const paginatedFunctions = allFilteredFunctions.slice(
-    0,
-    showAll.functions ? allFilteredFunctions.length : 10
-  );
-  const paginatedAtoms = allFilteredAtoms.slice(
-    0,
-    showAll.atoms ? allFilteredAtoms.length : 10
-  );
-  const paginatedTypes = allFilteredTypes.slice(
-    0,
-    showAll.types ? allFilteredTypes.length : 10
-  );
-  const paginatedPrivateTypes = allFilteredPrivateTypes.slice(
-    0,
-    showAll.types ? allFilteredPrivateTypes.length : 10
-  );
-  const paginatedConstants = allFilteredConstants.slice(
-    0,
-    showAll.constants ? allFilteredConstants.length : 10
-  );
-  const paginatedPrivateConstants = allFilteredPrivateConstants.slice(
-    0,
-    showAll.constants ? allFilteredPrivateConstants.length : 10
+    sourceFilter,
+    moduleFilter
   );
 
   // Calculate total counts for tabs
@@ -511,145 +526,136 @@ export default function Home() {
     }, {} as Record<SourceType, number>),
   };
 
-  // Check if there are more items to load
-  const hasMore = {
-    modules: !showAll.modules && allFilteredModules.length > 10,
-    functions: !showAll.functions && allFilteredFunctions.length > 10,
-    atoms: !showAll.atoms && allFilteredAtoms.length > 10,
-    types:
-      !showAll.types &&
-      allFilteredTypes.length + allFilteredPrivateTypes.length > 10,
-    constants:
-      !showAll.constants &&
-      allFilteredConstants.length + allFilteredPrivateConstants.length > 10,
-  };
-
   return (
-    <div className="m-5 lg:m-10">
-      <Header
-        stats={data.stats}
-        onRefresh={handleRefresh}
-        isLoading={loading}
+    <div className="min-h-screen bg-neutral-950">
+      <FileStructureSidebar
+        modules={data.modules}
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onSearchChange={(query, source, itemType, moduleKey) => {
+          setSearchQuery(query);
+          setSourceFilter(source as SourceType);
+          setModuleFilter(moduleKey || "");
+
+          // Set the appropriate tab based on item type
+          if (itemType === "function") {
+            setActiveTab("functions");
+          } else if (itemType === "type") {
+            setActiveTab("types");
+          } else if (itemType === "module") {
+            setActiveTab("modules");
+          }
+        }}
       />
-
-      <div className="bg-neutral-900/50 border border-neutral-700 rounded-lg p-6 mb-8">
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-sm font-medium text-neutral-300 mb-3">
-              I want to see
-            </h3>
-            <TabNavigation
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              tabCounts={tabCounts}
+      <div
+        className={`${sidebarOpen ? "ml-80" : ""} transition-all duration-300`}
+      >
+        <div className="m-5 lg:m-10">
+          <div className="flex-1">
+            <Header
+              stats={data.stats}
+              onRefresh={handleRefresh}
+              isLoading={loading}
             />
-          </div>
 
-          <div>
-            <h3 className="text-sm font-medium text-neutral-300 mb-3">From</h3>
-            <SearchFilters
-              toggleGlobalCodeBlocks={handleSearchFiltersCodeBlocksToggle}
-              showCodeBlocksByDefault={showCodeBlocksByDefault}
-              expandedCodeBlocks={expandedCodeBlocks}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              sourceFilter={sourceFilter}
-              setSourceFilter={setSourceFilter}
-              sourceCounts={sourceCounts}
-            />
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-neutral-300 mb-3">
-              Showing
-            </h3>
-            <div className="flex gap-2">
-              <CodeBlocksToggleButton onToggle={handleCodeBlocksToggle} />
-              <GridToggleButton onGridSizeChange={handleGridSizeChange} />
+            <div className="bg-pink-900/20 p-10 -mt-10 -mx-10 mb-10 ">
+              <div className="space-y-6">
+                <div>
+                  <SearchFilters
+                    toggleGlobalCodeBlocks={handleSearchFiltersCodeBlocksToggle}
+                    showCodeBlocksByDefault={showCodeBlocksByDefault}
+                    expandedCodeBlocks={expandedCodeBlocks}
+                    toggleGlobalImports={handleSearchFiltersImportsToggle}
+                    showImportsByDefault={showImportsByDefault}
+                    expandedImports={expandedImports}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    sourceFilter={sourceFilter}
+                    setSourceFilter={setSourceFilter}
+                    sourceCounts={sourceCounts}
+                    moduleFilter={moduleFilter}
+                    setModuleFilter={setModuleFilter}
+                    onGridSizeChange={handleGridSizeChange}
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    tabCounts={tabCounts}
+                  />
+                </div>
+              </div>
             </div>
+
+            <div className="overflow-x-auto">
+              {/* {activeTab === "overview" && <Overview />} */}
+              {activeTab === "modules" && (
+                <div className={getGridClasses(gridSize)}>
+                  <ModulesView
+                    modules={allFilteredModules}
+                    showCodeBlocksByDefault={showCodeBlocksByDefault}
+                    expandedCodeBlocks={expandedCodeBlocks}
+                    toggleCodeBlock={toggleCodeBlock}
+                    onModuleClick={(module) => {
+                      setSearchQuery("");
+                      setSourceFilter(module.source as SourceType);
+                      setModuleFilter(module.key);
+                      setActiveTab("functions");
+                    }}
+                  />
+                </div>
+              )}
+              {activeTab === "functions" && (
+                <div className={getGridClasses(gridSize)}>
+                  <FunctionsView
+                    functions={allFilteredFunctions}
+                    showCodeBlocksByDefault={showCodeBlocksByDefault}
+                    expandedCodeBlocks={expandedCodeBlocks}
+                    toggleCodeBlock={toggleCodeBlock}
+                    showImportsByDefault={showImportsByDefault}
+                    expandedImports={expandedImports}
+                    toggleImportBlock={toggleImportBlock}
+                  />
+                </div>
+              )}
+              {activeTab === "atoms" && (
+                <div className={getGridClasses(gridSize)}>
+                  <AtomsView
+                    atoms={allFilteredAtoms}
+                    showCodeBlocksByDefault={showCodeBlocksByDefault}
+                    expandedCodeBlocks={expandedCodeBlocks}
+                    toggleCodeBlock={toggleCodeBlock}
+                    showImportsByDefault={showImportsByDefault}
+                    expandedImports={expandedImports}
+                    toggleImportBlock={toggleImportBlock}
+                  />
+                </div>
+              )}
+              {activeTab === "types" && (
+                <div className={getGridClasses(gridSize)}>
+                  <TypesView
+                    types={allFilteredTypes}
+                    privateTypes={allFilteredPrivateTypes}
+                    showCodeBlocksByDefault={showCodeBlocksByDefault}
+                    expandedCodeBlocks={expandedCodeBlocks}
+                    toggleCodeBlock={toggleCodeBlock}
+                  />
+                </div>
+              )}
+              {activeTab === "constants" && (
+                <div className={getGridClasses(gridSize)}>
+                  <ConstantsView
+                    constants={allFilteredConstants}
+                    privateConstants={allFilteredPrivateConstants}
+                    showCodeBlocksByDefault={showCodeBlocksByDefault}
+                    expandedCodeBlocks={expandedCodeBlocks}
+                    toggleCodeBlock={toggleCodeBlock}
+                  />
+                </div>
+              )}
+            </div>
+
+            <Footer />
           </div>
         </div>
       </div>
-
-      <div className="overflow-x-auto">
-        {/* {activeTab === "overview" && <Overview />} */}
-        {activeTab === "modules" && (
-          <div className={getGridClasses(gridSize)}>
-            <ModulesView
-              modules={paginatedModules}
-              showCodeBlocksByDefault={showCodeBlocksByDefault}
-              expandedCodeBlocks={expandedCodeBlocks}
-              toggleCodeBlock={toggleCodeBlock}
-            />
-          </div>
-        )}
-        {activeTab === "functions" && (
-          <div className={getGridClasses(gridSize)}>
-            <FunctionsView
-              functions={paginatedFunctions}
-              showCodeBlocksByDefault={showCodeBlocksByDefault}
-              expandedCodeBlocks={expandedCodeBlocks}
-              toggleCodeBlock={toggleCodeBlock}
-            />
-          </div>
-        )}
-        {activeTab === "atoms" && (
-          <div className={getGridClasses(gridSize)}>
-            <AtomsView
-              atoms={paginatedAtoms}
-              showCodeBlocksByDefault={showCodeBlocksByDefault}
-              expandedCodeBlocks={expandedCodeBlocks}
-              toggleCodeBlock={toggleCodeBlock}
-            />
-          </div>
-        )}
-        {activeTab === "types" && (
-          <div className={getGridClasses(gridSize)}>
-            <TypesView
-              types={paginatedTypes}
-              privateTypes={paginatedPrivateTypes}
-              showCodeBlocksByDefault={showCodeBlocksByDefault}
-              expandedCodeBlocks={expandedCodeBlocks}
-              toggleCodeBlock={toggleCodeBlock}
-            />
-          </div>
-        )}
-        {activeTab === "constants" && (
-          <div className={getGridClasses(gridSize)}>
-            <ConstantsView
-              constants={paginatedConstants}
-              privateConstants={paginatedPrivateConstants}
-              showCodeBlocksByDefault={showCodeBlocksByDefault}
-              expandedCodeBlocks={expandedCodeBlocks}
-              toggleCodeBlock={toggleCodeBlock}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Universal Load More Button */}
-      {hasMore[activeTab] && (
-        <div className="text-center flex justify-center items-center mt-20 mb-40 ">
-          <button
-            onClick={() => loadMore(activeTab)}
-            className="button-1 px-6 py-2 flex items-center gap-1"
-          >
-            Load more {activeTab} (
-            {activeTab === "modules" && allFilteredModules.length - 10}
-            {activeTab === "functions" && allFilteredFunctions.length - 10}
-            {activeTab === "atoms" && allFilteredAtoms.length - 10}
-            {activeTab === "types" &&
-              allFilteredTypes.length + allFilteredPrivateTypes.length - 10}
-            {activeTab === "constants" &&
-              allFilteredConstants.length +
-                allFilteredPrivateConstants.length -
-                10}{" "}
-            remaining)
-            <IconChevronDown size={16} />
-          </button>
-        </div>
-      )}
-
-      <Footer />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 interface SourceBadgeProps {
-  source: "stdlib" | "prelude" | "vodka";
+  source: string;
 }
 
 export default function SourceBadge({ source }: SourceBadgeProps) {
-  return <span>{source}</span>;
+  return <span className="text-xs">{source}</span>;
 }

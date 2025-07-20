@@ -1,4 +1,4 @@
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconEye, IconEyeOff, IconDownload } from "@tabler/icons-react";
 import ItemCard from "./item-card";
 import ItemHeader from "./item-header";
 import ItemMeta from "./item-meta";
@@ -20,7 +20,7 @@ interface Atom {
   returnType: string;
   line: number;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka";
+  source: string;
   reExportedAs?: string[];
   implementation?: string;
   tests?: string[];
@@ -31,6 +31,9 @@ interface AtomsViewProps {
   showCodeBlocksByDefault: boolean;
   expandedCodeBlocks: Set<string>;
   toggleCodeBlock: (id: string) => void;
+  showImportsByDefault: boolean;
+  expandedImports: Set<string>;
+  toggleImportBlock: (id: string) => void;
 }
 
 export default function AtomsView({
@@ -38,13 +41,19 @@ export default function AtomsView({
   showCodeBlocksByDefault,
   expandedCodeBlocks,
   toggleCodeBlock,
+  showImportsByDefault,
+  expandedImports,
+  toggleImportBlock,
 }: AtomsViewProps) {
   return (
     <>
       {atoms.map((atom) => {
         const codeBlockId = `atom-${atom.fullName}`;
+        const importBlockId = `import-atom-${atom.fullName}`;
         const shouldShowCodeBlock =
           showCodeBlocksByDefault || expandedCodeBlocks.has(codeBlockId);
+        const shouldShowImportBlock =
+          showImportsByDefault || expandedImports.has(importBlockId);
         const hasCodeContent =
           atom.documentation ||
           atom.implementation ||
@@ -61,17 +70,41 @@ export default function AtomsView({
             <ItemMeta fullName={atom.fullName} />
 
             {/* Import Statement */}
-            <div className="my-5">
-              <CodeBlock
-                code={getImportStatement(
-                  atom.fullName,
-                  atom.name,
-                  atom.reExportedAs
-                )}
-                language="aiken"
-                showLineNumbers={false}
-              />
-            </div>
+            {shouldShowImportBlock && (
+              <div className="my-5">
+                <CodeBlock
+                  code={getImportStatement(
+                    atom.fullName,
+                    atom.name,
+                    atom.reExportedAs
+                  )}
+                  language="aiken"
+                  showLineNumbers={false}
+                />
+              </div>
+            )}
+
+            {/* Import Toggle Button */}
+            {!showImportsByDefault && (
+              <div className="mb-5">
+                <button
+                  onClick={() => toggleImportBlock(importBlockId)}
+                  className="text-sm text-blue-400 hover:text-blue-300 underline flex items-center gap-1"
+                >
+                  {expandedImports.has(importBlockId) ? (
+                    <>
+                      <IconEyeOff size={16} />
+                      Hide import
+                    </>
+                  ) : (
+                    <>
+                      <IconDownload size={16} />
+                      Show import
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
 
             {/* Code Block Toggle Button */}
             {hasCodeContent && !showCodeBlocksByDefault && (

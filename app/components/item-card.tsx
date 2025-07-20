@@ -3,15 +3,13 @@ import { forwardRef } from "react";
 interface ItemCardProps {
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 const ItemCard = forwardRef<HTMLDivElement, ItemCardProps>(
-  ({ children, className = "" }, ref) => {
+  ({ children, className = "", onClick }, ref) => {
     return (
-      <div
-        ref={ref}
-        className={`p-5 border-b border-neutral-800  ${className}`}
-      >
+      <div ref={ref} className={`  ${className}`} onClick={onClick}>
         {children}
       </div>
     );

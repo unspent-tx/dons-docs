@@ -4,10 +4,11 @@ import {
   IconLayoutDashboard,
   IconSquare,
   IconGrid3x3,
+  IconLayoutList,
 } from "@tabler/icons-react";
 import { useState } from "react";
 
-export type GridSize = "1" | "2" | "3" | "4";
+export type GridSize = "1" | "2" | "3" | "4" | "flex";
 
 interface GridToggleButtonProps {
   onGridSizeChange?: (gridSize: GridSize) => void;
@@ -28,6 +29,8 @@ export default function GridToggleButton({
         case "3":
           return "4";
         case "4":
+          return "flex";
+        case "flex":
           return "1";
         default:
           return "4";
@@ -49,6 +52,8 @@ export default function GridToggleButton({
         return IconGrid3x3;
       case "4":
         return IconLayoutDashboard;
+      case "flex":
+        return IconLayoutList;
       default:
         return IconLayoutGrid;
     }
@@ -63,7 +68,7 @@ export default function GridToggleButton({
         const IconComponent = getGridIcon();
         return <IconComponent size={16} />;
       })()}
-      Grid {gridSize}
+      {gridSize === "flex" ? "Flex" : `Grid ${gridSize}`}
     </button>
   );
 }
@@ -79,6 +84,8 @@ export const getGridClasses = (gridSize: GridSize) => {
       return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5";
     case "4":
       return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5";
+    case "flex":
+      return "flex flex-wrap gap-5";
     default:
       return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5";
   }

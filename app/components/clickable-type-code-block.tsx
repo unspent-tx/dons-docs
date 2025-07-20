@@ -1,20 +1,20 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { customTheme } from "./code-block";
 import { Highlight } from "prism-react-renderer";
 
-interface Type {
+interface AikenType {
   fullName: string;
   name: string;
   definition: string;
   line: number;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka";
+  source: string;
   reExportedAs?: string[];
 }
 
 interface ClickableTypeCodeBlockProps {
   code: string;
-  availableTypes: Type[];
+  availableTypes: AikenType[];
   onTypeClick: (typeName: string) => void;
   className?: string;
 }
@@ -35,7 +35,7 @@ export default function ClickableTypeCodeBlock({
 
   // Create a simple map of type names for quick lookup
   const typeMap = useCallback(() => {
-    const map = new Map<string, Type>();
+    const map = new Map<string, AikenType>();
     availableTypes.forEach((type) => {
       // Just add the simple name (e.g., "KeepValue" from "KeepValue<key, value>")
       const simpleName = type.name.split("<")[0];
@@ -168,7 +168,11 @@ export default function ClickableTypeCodeBlock({
                             );
                           }
 
-                          return <>{parts}</>;
+                          return (
+                            <React.Fragment key={`parts-${key}`}>
+                              {parts}
+                            </React.Fragment>
+                          );
                         }
                       }
 

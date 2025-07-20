@@ -12,7 +12,7 @@ interface Constant {
   value: string;
   line: number;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka";
+  source: string;
   reExportedAs?: string[];
 }
 

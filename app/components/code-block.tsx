@@ -119,11 +119,6 @@ export default function CodeBlock({
       onClick={copyToClipboard}
       className={`relative cursor-pointer rounded-lg overflow-hidden active:ring-2 ty active:ring-pink-300 transition-all  bg-neutral-900 ${className}`}
     >
-      <div className="absolute right-2 top-2">
-        <button className="px-2 py-1 text-xs text-gray-400 hover:text-white bg-gray-800 rounded transition-colors">
-          {copied ? "Copied!" : "Copy"}
-        </button>
-      </div>
       <Highlight theme={customTheme} code={code.trim()} language={language}>
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <pre className={`${className} p-4 overflow-x-auto`} style={style}>

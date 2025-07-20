@@ -6,19 +6,19 @@ import ClickableTypeCodeBlock from "./clickable-type-code-block";
 import ReExportBadge from "./re-export-badge";
 import SectionTitle from "./section-title";
 
-interface Type {
+interface AikenType {
   fullName: string;
   name: string;
   definition: string;
   line: number;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka";
+  source: string;
   reExportedAs?: string[];
 }
 
 interface TypesViewProps {
-  types: Type[];
-  privateTypes: Type[];
+  types: AikenType[];
+  privateTypes: AikenType[];
   showCodeBlocksByDefault: boolean;
   expandedCodeBlocks: Set<string>;
   toggleCodeBlock: (id: string) => void;

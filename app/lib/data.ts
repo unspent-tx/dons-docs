@@ -7,9 +7,39 @@ export interface AikenData {
     name: string;
     source: string;
     description?: string;
-    functions: string[];
-    types: string[];
-    constants: string[];
+    functions: Array<{
+      name: string;
+      signature: string;
+      documentation?: string;
+      parameters: Array<{
+        name: string;
+        type: string;
+        optional?: boolean;
+      }>;
+      returnType: string;
+      line: number;
+      raw: string;
+      isPublic: boolean;
+      source: string;
+      implementation?: string;
+    }>;
+    types: Array<{
+      name: string;
+      definition: string;
+      line: number;
+      raw: string;
+      isPublic: boolean;
+      source: string;
+    }>;
+    constants: Array<{
+      name: string;
+      type: string;
+      value: string;
+      line: number;
+      raw: string;
+      isPublic: boolean;
+      source: string;
+    }>;
   }>;
   functions: Array<{
     key: string;

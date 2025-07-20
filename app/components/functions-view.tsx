@@ -5,6 +5,7 @@ import {
   IconEye,
   IconEyeOff,
   IconGitCompare,
+  IconDownload,
 } from "@tabler/icons-react";
 import ItemCard from "./item-card";
 import ItemHeader from "./item-header";
@@ -27,7 +28,7 @@ interface Function {
   returnType: string;
   line: number;
   isPublic: boolean;
-  source: "stdlib" | "prelude" | "vodka";
+  source: string;
   reExportedAs?: string[];
   implementation?: string;
   tests?: string[];
@@ -38,6 +39,9 @@ interface FunctionsViewProps {
   showCodeBlocksByDefault: boolean;
   expandedCodeBlocks: Set<string>;
   toggleCodeBlock: (id: string) => void;
+  showImportsByDefault: boolean;
+  expandedImports: Set<string>;
+  toggleImportBlock: (id: string) => void;
 }
 
 export default function FunctionsView({
@@ -45,13 +49,19 @@ export default function FunctionsView({
   showCodeBlocksByDefault,
   expandedCodeBlocks,
   toggleCodeBlock,
+  showImportsByDefault,
+  expandedImports,
+  toggleImportBlock,
 }: FunctionsViewProps) {
   return (
     <>
       {functions.map((func) => {
         const codeBlockId = `func-${func.fullName}`;
+        const importBlockId = `import-func-${func.fullName}`;
         const shouldShowCodeBlock =
           showCodeBlocksByDefault || expandedCodeBlocks.has(codeBlockId);
+        const shouldShowImportBlock =
+          showImportsByDefault || expandedImports.has(importBlockId);
         const hasCodeContent =
           func.documentation ||
           func.implementation ||
@@ -66,39 +76,23 @@ export default function FunctionsView({
             <ItemMeta fullName={func.fullName} />
 
             {/* Import Statement */}
-            <div className="my-5">
-              <CodeBlock
-                code={getImportStatement(
-                  func.fullName,
-                  func.name,
-                  func.reExportedAs
-                )}
-                language="aiken"
-                showLineNumbers={false}
-              />
-            </div>
-
-            {/* Code Block Toggle Button */}
-            {hasCodeContent && !showCodeBlocksByDefault && (
-              <div className="mb-5">
-                <button
-                  onClick={() => toggleCodeBlock(codeBlockId)}
-                  className="text-sm cursor-pointer text-pink-400 hover:text-pink-300 underline flex items-center gap-1"
-                >
-                  {expandedCodeBlocks.has(codeBlockId) ? (
-                    <>
-                      <IconEyeOff size={16} />
-                      Hide code
-                    </>
-                  ) : (
-                    <>
-                      <IconBrackets size={16} />
-                      Show code
-                    </>
+            {shouldShowImportBlock && (
+              <div className="my-5 relative">
+                <CodeBlock
+                  code={getImportStatement(
+                    func.fullName,
+                    func.name,
+                    func.reExportedAs
                   )}
-                </button>
+                  language="aiken"
+                  showLineNumbers={false}
+                />
               </div>
             )}
+
+            {/* Import Toggle Button */}
+
+            {/* Code Block Toggle Button */}
 
             {/* Complete Function Block */}
             {hasCodeContent && shouldShowCodeBlock && (
