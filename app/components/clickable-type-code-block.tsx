@@ -127,7 +127,7 @@ export default function ClickableTypeCodeBlock({
                             if (match.start > lastIndex) {
                               parts.push(
                                 <span
-                                  key={`text-${matchIndex}`}
+                                  key={`text-${matchIndex}-${match.start}`}
                                   {...tokenProps}
                                 >
                                   {tokenText.slice(lastIndex, match.start)}
@@ -142,7 +142,7 @@ export default function ClickableTypeCodeBlock({
                             if (type) {
                               parts.push(
                                 <button
-                                  key={`type-${matchIndex}`}
+                                  key={`type-${matchIndex}-${match.start}`}
                                   onClick={() => onTypeClick(type.name)}
                                   className="text-pink-400 hover:text-blue-300 hover:underline cursor-pointer bg-transparent border-none p-0 font-mono"
                                   title={`Click to navigate to ${type.name}`}
@@ -159,7 +159,10 @@ export default function ClickableTypeCodeBlock({
                           // Add remaining text
                           if (lastIndex < tokenText.length) {
                             parts.push(
-                              <span key="text-end" {...tokenProps}>
+                              <span
+                                key={`text-end-${lastIndex}`}
+                                {...tokenProps}
+                              >
                                 {tokenText.slice(lastIndex)}
                               </span>
                             );
