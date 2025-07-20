@@ -18,7 +18,7 @@ export default function ItemHeader({
       <div className="flex items-center gap-2 justify-between">
         <h4 className="text-sm font-semibold text-pink-300">{name}</h4>
         <div>
-          | <SourceBadge source={source} />
+          <SourceBadge source={source} />|
         </div>
         {/* {badges &&
           badges.map((badge, index) => <span key={index}>{badge}</span>)} */}
