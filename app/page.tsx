@@ -24,6 +24,7 @@ import ImportsToggleButton from "./components/imports-toggle-button";
 import FileStructureSidebar from "./components/file-structure-sidebar";
 import { SourceType, getSortedPackages } from "./lib/client-registry";
 import { loadAikenData, type AikenData } from "./lib/data";
+import offchainData from "../public/offchain-data.json";
 
 interface LibraryData {
   stats: {
@@ -160,6 +161,40 @@ export default function Home() {
 
   // Sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Merge Aiken and Offchain modules for the sidebar
+  const normalizeModule = (mod: any) => ({
+    ...mod,
+    constants: Array.isArray(mod.constants) ? mod.constants : [],
+    types: (mod.types || []).map((t: any) => ({
+      name: t.name ?? "",
+      definition: t.definition ?? "",
+      line: t.line ?? 0,
+      raw: t.raw ?? "",
+      isPublic: t.isPublic ?? true,
+      source: t.source ?? mod.source ?? "",
+    })),
+    functions: (mod.functions || []).map((f: any) => ({
+      name: f.name ?? "",
+      signature: f.signature ?? "",
+      documentation: f.documentation ?? "",
+      parameters: Array.isArray(f.parameters) ? f.parameters : [],
+      returnType: f.returnType ?? "",
+      line: f.line ?? 0,
+      raw: f.raw ?? "",
+      isPublic: f.isPublic ?? true,
+      source: f.source ?? mod.source ?? "",
+      implementation: f.implementation ?? "",
+    })),
+  });
+  const normalizedAikenModules = (data?.modules || []).map(normalizeModule);
+  const normalizedOffchainModules = (offchainData?.modules || []).map(
+    normalizeModule
+  );
+  const mergedModules = [
+    ...normalizedAikenModules,
+    ...normalizedOffchainModules,
+  ];
 
   const toggleCodeBlock = (id: string) => {
     setExpandedCodeBlocks((prev) => {
@@ -529,7 +564,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-neutral-950">
       <FileStructureSidebar
-        modules={data.modules}
+        modules={mergedModules}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onSearchChange={(query, source, itemType, moduleKey) => {
